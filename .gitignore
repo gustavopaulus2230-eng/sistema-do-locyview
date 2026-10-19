@@ -1,0 +1,8 @@
+node_modules/
+front/node_modules/
+front/build/
+build/
+.sites-runtime/
+*.log
+.env
+.env.local

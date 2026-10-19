@@ -1,0 +1,18 @@
+{
+  "name": "locyview-painel-front",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 4174 --strictPort",
+    "build": "vite build --outDir ../build --emptyOutDir",
+    "preview": "vite preview --outDir ../build --host 127.0.0.1 --port 4174 --strictPort"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "vite": "^6.3.6"
+  }
+}
