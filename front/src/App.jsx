@@ -4,7 +4,8 @@ import Products from './pages/Products';
 import Editor, { ProductEditor } from './components/Editor';
 import Modal from './components/Modal';
 import Icon from './components/Icon';
-import { categoryName, contrastText, copyText, loadPageState, quoteDestinations, safeUrl, shareUrl, STORAGE_KEY } from './utils/pageState';
+import PageSurface from './components/PageSurface';
+import { categoryName, copyText, loadPageState, quoteDestinations, safeUrl, shareUrl, STORAGE_KEY } from './utils/pageState';
 
 function CloseButton({ label, onClick, className = 'icon-button' }) {
   return <button type="button" className={className} aria-label={label} onClick={onClick}><Icon name="close" /></button>;
@@ -83,7 +84,6 @@ export default function App() {
   const [toastMessage, setToastMessage] = useState('');
   const toastTimer = useRef(null);
   const firstView = useRef(true);
-  const theme = { '--brand-primary': state.primaryColor, '--brand-accent': state.accentColor, '--page-background': state.backgroundColor, '--on-primary': contrastText(state.primaryColor), '--brand-ink': contrastText(state.backgroundColor) };
 
   function toast(message) {
     window.clearTimeout(toastTimer.current);
@@ -94,13 +94,19 @@ export default function App() {
   useEffect(() => () => window.clearTimeout(toastTimer.current), []);
 
   useEffect(() => {
-    document.documentElement.style.setProperty('--brand-primary', state.primaryColor);
-    document.documentElement.style.setProperty('--brand-accent', state.accentColor);
-    document.documentElement.style.setProperty('--page-background', state.backgroundColor);
+    const previousBackground = document.body.style.backgroundColor;
+    const previouslyShared = document.body.classList.contains('shared-page');
     document.body.style.backgroundColor = state.backgroundColor;
     document.body.classList.toggle('shared-page', initial.publicMode);
+    return () => {
+      document.body.style.backgroundColor = previousBackground;
+      document.body.classList.toggle('shared-page', previouslyShared);
+    };
+  }, [state.backgroundColor, initial.publicMode]);
+
+  useEffect(() => {
     document.title = currentView === 'products' ? `Nossos produtos · ${state.name || 'LocyTech'}` : `${state.name || 'LocyTech'} · Canais e produtos`;
-  }, [state.primaryColor, state.accentColor, state.backgroundColor, state.name, currentView, initial.publicMode]);
+  }, [state.name, currentView]);
 
   useEffect(() => {
     if (firstView.current) { firstView.current = false; return; }
@@ -171,10 +177,10 @@ export default function App() {
   const status = statusOverride || (dirty ? 'Alterações não salvas' : savedAt ? 'Salvo neste navegador' : 'Personalize sua página');
   const ownerTools = import.meta.env.DEV && !initial.publicMode && <div id="owner-tools" className="owner-tools"><button type="button" id="editor-launch" className="owner-button" onClick={() => openEditor()}><Icon name="edit" />Personalizar página</button><button type="button" id="share-launch" className="owner-share" aria-label="Compartilhar página" title="Compartilhar página" onClick={openShare}><Icon name="share" /></button></div>;
 
-  return <div className="app-shell" style={theme}>
+  return <PageSurface page={state} className="app-shell">
     <main id="site-shell" className={`site-shell${currentView === 'products' ? ' showing-products' : ''}`}>
       {initial.error && <p role="alert" className="catalog-empty public-load-error">{initial.error}</p>}
-      <div id="page-content" className="page-content" key={currentView}>{currentView === 'hub' ? <Hub state={state} ownerTools={ownerTools} onProducts={() => switchView('products')} onUnavailable={title => setModal({ type: 'contact', title })} /> : <Products state={state} ownerTools={ownerTools} onBack={() => switchView('hub')} onDetail={id => setModal({ type: 'detail', id })} />}</div>
+      <div id="page-content" className="page-content" key={currentView}>{currentView === 'hub' ? <Hub state={state} headingId="identity-heading" ownerTools={ownerTools} onProducts={() => switchView('products')} onUnavailable={title => setModal({ type: 'contact', title })} /> : <Products state={state} headingId="products-heading" ownerTools={ownerTools} onBack={() => switchView('hub')} onDetail={id => setModal({ type: 'detail', id })} />}</div>
     </main>
     {modal?.type === 'editor' && <Editor state={state} activeTab={editorTab} onTab={setEditorTab} onChange={changeState} onClose={() => setModal(null)} onSave={saveDraft} onShare={openShare} onEditProduct={editProduct} onProductAction={productAction} status={status} toast={toast} />}
     {modal?.type === 'edit-product' && <ProductEditor product={state.products.find(product => product.id === modal.id)} onClose={() => openEditor('products')} onSave={saveProduct} />}
@@ -183,5 +189,5 @@ export default function App() {
     {modal?.type === 'share' && <ShareDialog url={modal.url} onClose={() => setModal(null)} toast={toast} />}
     {modal?.type === 'contact' && <Modal id="contact-dialog" className="modal contact-modal" labelledBy="contact-unavailable-heading" onClose={() => setModal(null)}><div className="modal-topline"><span className="modal-eyebrow">CONTATO</span><CloseButton label="Fechar informações de contato" onClick={() => setModal(null)} /></div><h2 id="contact-unavailable-heading">{modal.title} não configurado.</h2><p className="modal-description">Este canal ainda não tem um link disponível. Você pode consultar os produtos no catálogo.</p><button type="button" className="button button-primary button-full" onClick={() => switchView('products')}>Ver nossos produtos<Icon name="arrow" /></button></Modal>}
     <div id="toast" className={`toast${toastMessage ? ' is-visible' : ''}`} role="status" aria-live="polite" hidden={!toastMessage}>{toastMessage}</div>
-  </div>;
+  </PageSurface>;
 }

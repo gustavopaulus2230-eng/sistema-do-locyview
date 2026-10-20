@@ -32,7 +32,8 @@ export function BrandFields({ state, onChange, toast, prefix = '', showPageField
         const optimized = await optimizeLogo(source);
         if (version !== logoVersion.current) return;
         onChange({ logo: optimized });
-        toast('Logo atualizada.');
+        if (logoInput.current) logoInput.current.value = '';
+        toast('Logo atualizada na prévia. Salve para guardar.');
       } catch {
         if (version !== logoVersion.current) return;
         if (logoInput.current) logoInput.current.value = '';
@@ -52,7 +53,7 @@ export function BrandFields({ state, onChange, toast, prefix = '', showPageField
   }
 
   return <>
-    {!hideLogo && <><span className="field-label">Logo da marca</span><div className="logo-upload">{logo ? <img id={id('logo-preview')} src={logo} alt="Logo atual" /> : <span className="logo-placeholder"><Icon name="brand" size={32} /></span>}<div><label className={`button button-secondary button-small${uploading ? ' is-loading' : ''}`} htmlFor={id('brand-logo')}><Icon name="upload" />{uploading ? 'Processando imagem…' : 'Alterar logo'}</label><button type="button" id={id('remove-logo')} className="text-button" disabled={!logo && !uploading} onClick={removeLogo}>Remover</button><p>PNG, JPG ou WebP · até 1,5 MB</p></div><input ref={logoInput} id={id('brand-logo')} className="visually-hidden" type="file" accept="image/png,image/jpeg,image/webp" aria-label="Enviar logo" onChange={uploadLogo} disabled={uploading} /></div></>}
+    {!hideLogo && <><span className="field-label">Logo da marca</span><div className="logo-upload">{logo ? <img id={id('logo-preview')} src={logo} alt="Logo atual" /> : <span className="logo-placeholder"><Icon name="brand" size={32} /></span>}<div><button type="button" className={`button button-secondary button-small${uploading ? ' is-loading' : ''}`} onClick={() => logoInput.current?.click()} disabled={uploading}><Icon name="upload" />{uploading ? 'Processando imagem…' : 'Trocar logo'}</button><button type="button" id={id('remove-logo')} className="text-button" disabled={!logo && !uploading} onClick={removeLogo}>Remover</button><p>PNG, JPG ou WebP · até 1,5 MB</p></div><input ref={logoInput} id={id('brand-logo')} className="visually-hidden" type="file" accept="image/png,image/jpeg,image/webp" aria-label="Enviar logo" onChange={uploadLogo} disabled={uploading} /></div></>}
     {!hideName && <div className="field"><label htmlFor={id('brand-name')}>Nome da marca <span>*</span></label><input id={id('brand-name')} value={state.name} maxLength={60} required placeholder="Nome da marca" onChange={event => onChange({ name: event.target.value })} /></div>}
     {showPageFields && <>
     <div className="field"><label htmlFor={id('brand-eyebrow')}>Texto acima do nome</label><input id={id('brand-eyebrow')} value={state.eyebrow} maxLength={70} placeholder="Ex.: Canais e produtos" onChange={event => onChange({ eyebrow: event.target.value })} /></div>
@@ -64,25 +65,43 @@ export function BrandFields({ state, onChange, toast, prefix = '', showPageField
 
 function ColorField({ value, onChange, id, label, hint, readOnly = false }) {
   const [hex, setHex] = useState(value);
-  useEffect(() => { setHex(value); }, [value]);
+  const [error, setError] = useState(false);
+  useEffect(() => { setHex(value); setError(false); }, [value]);
+
+  function parseHex(raw) {
+    const next = raw.trim().replace(/^#/, '');
+    if (/^[\da-f]{6}$/i.test(next)) return `#${next.toLowerCase()}`;
+    if (/^[\da-f]{3}$/i.test(next)) return `#${next.split('').map(character => character.repeat(2)).join('').toLowerCase()}`;
+    return '';
+  }
 
   function updateSwatch(event) {
     const next = event.target.value;
     setHex(next);
+    setError(false);
     onChange(next);
   }
 
   function updateHex(event) {
     const next = event.target.value;
     setHex(next);
-    if (/^#[\da-f]{6}$/i.test(next)) onChange(next);
+    setError(false);
+    if (/^#?[\da-f]{6}$/i.test(next) && parseHex(next) !== value.toLowerCase()) onChange(parseHex(next));
+  }
+
+  function commitHex() {
+    if (readOnly) return;
+    const next = parseHex(hex);
+    if (next) { setHex(next); setError(false); if (next !== value.toLowerCase()) onChange(next); }
+    else setError(true);
   }
 
   return <div className="color-option">
     <input id={id} type="color" value={value} onInput={updateSwatch} onChange={updateSwatch} disabled={readOnly} />
     <label htmlFor={id}><strong>{label}</strong></label>
     <small>{hint}</small>
-    <input id={`${id}-hex`} className="color-hex" type="text" value={hex} onChange={updateHex} onBlur={() => { if (!/^#[\da-f]{6}$/i.test(hex)) setHex(value); }} readOnly={readOnly} aria-label={`Cor ${label} em hexadecimal${readOnly ? ' (definida pela marca)' : ''}`} title={readOnly ? 'Definida pela marca selecionada' : 'Use #RRGGBB'} placeholder="#RRGGBB" maxLength={7} spellCheck={false} autoComplete="off" />
+    <input id={`${id}-hex`} className="color-hex" type="text" value={hex} onChange={updateHex} onBlur={commitHex} onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); commitHex(); } }} readOnly={readOnly} required={!readOnly} pattern="#?([a-fA-F0-9]{3}|[a-fA-F0-9]{6})" aria-invalid={error || undefined} aria-describedby={error ? `${id}-error` : undefined} aria-label={`Cor ${label} em hexadecimal${readOnly ? ' (definida pela marca)' : ''}`} title={readOnly ? 'Definida pela marca selecionada' : 'Use #RRGGBB ou #RGB'} placeholder="#RRGGBB" maxLength={7} spellCheck={false} autoComplete="off" />
+    {error && <small id={`${id}-error`} className="lv-color-error" role="alert">Cor não aplicada. Use #RRGGBB ou #RGB.</small>}
   </div>;
 }
 

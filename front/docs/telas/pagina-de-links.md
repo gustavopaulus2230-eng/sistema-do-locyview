@@ -8,9 +8,9 @@ Testar a configuração de um cliente dentro do sistema LocyView, sem modificar 
 
 O painel é a página principal `/`. O modelo abre em `/preview` com componentes copiados e mantidos neste próprio projeto. Não importa arquivos de `locytech-bio` nem lê seu armazenamento.
 
-`Hub` exibe marca e quatro opções: Instagram, WhatsApp, LinkedIn e Nossos produtos. As três primeiras abrem destinos configurados em outra aba; um canal vazio exibe aviso. A quarta abre `Products`, sem alterar o snapshot da URL. `BrandFooter` respeita `showBrand`.
+`Hub` exibe marca e quatro opções: Instagram, WhatsApp, LinkedIn e Nossos produtos. A ordem é configurada em `design.channelOrder`; a ordem inicial é essa, mas pode ser alterada no painel. As três primeiras abrem destinos configurados em outra aba; um canal vazio exibe aviso. A quarta abre `Products`, sem alterar o snapshot da URL. `BrandFooter` respeita `showBrand`.
 
-A prévia é responsiva: identidade compacta e opções em uma coluna em telas pequenas; composição lado a lado a partir de 901 pixels. Adaptação por largura CSS, sem `userAgent` ou iframe. Os controles antigos de personalização e compartilhamento não são exibidos na prévia.
+`PageSurface` aplica o mesmo visual ao modelo completo e à prévia do editor: seis composições, quatro estilos de cartão e fundo, tipografia, medidas e visibilidade dos detalhes. O layout Lateral fica lado a lado quando há espaço; os demais respeitam sua composição e todos se adaptam a telas pequenas. Adaptação por largura CSS, sem `userAgent` ou iframe. Os controles antigos de personalização e compartilhamento não são exibidos na prévia.
 
 ## Arquivos fonte de verdade
 
@@ -19,15 +19,18 @@ A prévia é responsiva: identidade compacta e opções em uma coluna em telas p
 - `src/pages/Hub.jsx`: canais e rodapé.
 - `src/utils/adminState.js`: URL de demonstração.
 - `src/utils/pageState.js`: dados públicos e validação.
-- `src/styles/global.css`: responsividade do modelo.
+- `src/components/PageSurface.jsx`: tema e atributos do visual.
+- `src/utils/pageDesign.js`: 24 presets e normalização.
+- `src/styles/pageDesign.css`: composições e tema configurável.
+- `src/styles/global.css`: estilos base do modelo.
 
 ## Modelo de dados / fluxo
 
-`state.links` mantém Instagram, WhatsApp e LinkedIn; Nossos produtos conta apenas itens habilitados. Cores e textos vêm da configuração, e URLs passam por `safeUrl`.
+`state.links` mantém Instagram, WhatsApp e LinkedIn; Nossos produtos conta apenas itens habilitados. Cores, textos e visual vêm da configuração, e URLs passam por `safeUrl`. O campo `design` controla ordem, layout, estilo dos cartões e fundo, fonte, escala, cantos, espaços, logo, alinhamento, ícones, descrições e setas. Aplicar um dos 24 modelos não troca conteúdo nem cores.
 
-`clientPreviewUrl` gera `/preview#p=` na origem do painel com dados públicos sanitizados. Nome administrativo, datas e vínculo interno de marca não entram no link. O identificador não cria caminho por cliente ou publicação. O link guarda uma versão, não acompanha edições posteriores e não tem revogação.
+`clientPreviewUrl` gera `/preview#p=` na origem do painel com dados públicos sanitizados. Nome administrativo, datas, vínculo interno de marca e `identityOverrides` não entram no link. O visual normalizado faz parte do snapshot. O identificador não cria caminho por cliente ou publicação. O link guarda uma versão, não acompanha edições posteriores e não tem revogação.
 
-A identidade de uma marca vinculada é resolvida antes de criar o snapshot. A demonstração passa a conter nome, logo e cores daquele momento, sem consultar cadastros futuros. Atualizar uma marca no painel não altera snapshots anteriores.
+A identidade de uma marca vinculada é resolvida antes de criar o snapshot, respeitando nome, logo e cores personalizados na página. A demonstração passa a conter nome, logo e cores daquele momento, sem consultar cadastros futuros. Atualizar uma marca no painel não altera snapshots anteriores.
 
 O modelo LocyTech usa Instagram `https://www.instagram.com/locytech/`, WhatsApp `https://wa.me/5551920057268` e LinkedIn genérico. São referências locais, não leitura do primeiro site. Novos cadastros começam com destinos vazios e são normalizados sem migração de padrões antigos.
 
@@ -46,6 +49,8 @@ O modelo LocyTech usa Instagram `https://www.instagram.com/locytech/`, WhatsApp 
 
 - Conferir quatro opções, ordem e destinos.
 - Testar textos longos, ausência de logo, assinatura e catálogo vazio.
+- Conferir os 24 modelos na mesma configuração e todas as ordens/visibilidades dos canais.
+- Testar fundos e cores claros e escuros com contraste legível.
 - Gerar `/preview#p=` e testar catálogo e retorno sem controles de edição.
 - Testar 320 e 390 pixels, tablet e computador sem rolagem horizontal.
 - Confirmar que o snapshot não muda ao editar marca ou página posteriormente.
@@ -57,6 +62,9 @@ O modelo LocyTech usa Instagram `https://www.instagram.com/locytech/`, WhatsApp 
 - [Modelo completo](../../src/App.jsx)
 - [Canais e rodapé](../../src/pages/Hub.jsx)
 - [Identidade visual](../../src/components/BrandAtmosphere.jsx)
+- [Renderizador de visual](../../src/components/PageSurface.jsx)
+- [Modelos e normalização](../../src/utils/pageDesign.js)
+- [Estilos configuráveis](../../src/styles/pageDesign.css)
 - [Validação e snapshot](../../src/utils/pageState.js)
 - [Link da demonstração](../../src/utils/adminState.js)
 - [Estilos do modelo](../../src/styles/global.css)

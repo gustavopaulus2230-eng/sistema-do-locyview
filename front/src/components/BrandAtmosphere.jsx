@@ -1,16 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { contrastText, DEFAULT_LOGO, safeLogo } from '../utils/pageState';
+import { normalizeDesign } from '../utils/pageDesign';
 
-export default function BrandAtmosphere({ logo = DEFAULT_LOGO, name = 'LocyTech', backgroundColor = '#080f20' }) {
+export default function BrandAtmosphere({ logo = DEFAULT_LOGO, name = 'Sua marca', backgroundColor = '#080f20', design: sourceDesign }) {
   const canvasRef = useRef(null);
   const [available, setAvailable] = useState(Boolean(logo));
   const imageSource = safeLogo(logo);
-  const defaultArtwork = imageSource === DEFAULT_LOGO;
-  const lightBackdrop = contrastText(backgroundColor) === '#000000';
+  const design = normalizeDesign(sourceDesign);
 
   useEffect(() => { setAvailable(Boolean(imageSource)); }, [imageSource]);
 
   useEffect(() => {
+    if (design.backgroundStyle !== 'stars') return undefined;
     const canvas = canvasRef.current;
     const context = canvas?.getContext('2d');
     if (!context) return undefined;
@@ -20,7 +21,7 @@ export default function BrandAtmosphere({ logo = DEFAULT_LOGO, name = 'LocyTech'
     let height = 0;
     let lastFrame = 0;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const starColor = contrastText(backgroundColor) === '#ffffff' ? '#d8e5ff' : '#314867';
+    const starColor = contrastText(backgroundColor);
     const stars = Array.from({ length: 190 }, (_, index) => ({
       x: (index * 0.61803398875) % 1,
       y: (index * 0.41421356237 + 0.13) % 1,
@@ -67,12 +68,10 @@ export default function BrandAtmosphere({ logo = DEFAULT_LOGO, name = 'LocyTech'
       observer.disconnect();
       motion.removeEventListener('change', motionChange);
     };
-  }, [backgroundColor]);
+  }, [backgroundColor, design.backgroundStyle]);
 
   return <section className="hub-brand" aria-label={`Identidade ${name}`}>
-    <div className="brand-topline"><span className="brand-topline-dot" /><span>LOCYTECH</span></div>
-    <canvas ref={canvasRef} className="brand-canvas" aria-hidden="true" />
-    {available && imageSource ? <div className={`brand-artwork${defaultArtwork ? ' brand-artwork-default' : ''}${lightBackdrop ? ' is-light-backdrop' : ''}`}><img className="brand-logo" src={imageSource} alt={`Logo ${name || 'LocyTech'}`} decoding="async" onLoad={() => setAvailable(true)} onError={() => setAvailable(false)} /></div> : <div className="brand-fallback"><span className="brand-monogram">{(name || 'LT').slice(0, 2).toUpperCase()}</span><strong>{name || 'LocyTech'}</strong></div>}
-    <div className="brand-caption"><p>Sites, landing pages e conexões.</p><span>Da primeira visita ao próximo projeto.</span></div>
+    {design.backgroundStyle === 'stars' && <canvas ref={canvasRef} className="brand-canvas" aria-hidden="true" />}
+    {available && imageSource ? <div className="brand-artwork"><img className="brand-logo" src={imageSource} alt={`Logo ${name || 'da marca'}`} decoding="async" onLoad={() => setAvailable(true)} onError={() => setAvailable(false)} /></div> : <div className="brand-fallback"><span className="brand-monogram">{(name || 'SM').slice(0, 2).toUpperCase()}</span></div>}
   </section>;
 }

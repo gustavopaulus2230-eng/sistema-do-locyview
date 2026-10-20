@@ -1,4 +1,5 @@
 import { cleanSlug, clone, defaults, normalize, safeLogo, safeUrl, shareUrl, socialDefaults, uid } from './pageState';
+import { normalizeDesign } from './pageDesign';
 
 export const ADMIN_STORAGE_KEY = 'locyview-admin:v2';
 export const LEGACY_ADMIN_STORAGE_KEY = 'locyview-admin:v1';
@@ -14,6 +15,8 @@ const trimmed = value => typeof value === 'string' ? value.trim() : '';
 const validColor = value => typeof value === 'string' && /^#[\da-f]{6}$/i.test(value);
 const validDate = value => value === null || (typeof value === 'string' && Number.isFinite(Date.parse(value)));
 const brandNameKey = value => trimmed(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR').replace(/\s+/g, ' ');
+const validOverrides = value => value === undefined || (Array.isArray(value) && value.length <= brandFields.length && new Set(value).size === value.length && Array.from(value).every(field => brandFields.includes(field)));
+const normalizeOverrides = value => Array.isArray(value) ? brandFields.filter(field => value.includes(field)) : [];
 
 function cleanBrand(brand) {
   return {
@@ -62,15 +65,16 @@ function blankPage() {
 }
 
 export function createClientRecord() {
-  return { id: uid(), clientName: '', brandId: '', page: blankPage(), updatedAt: null };
+  return { id: uid(), clientName: '', brandId: '', identityOverrides: [], page: blankPage(), updatedAt: null };
 }
 
 export function applyBrandToRecord(record, brands = []) {
   const brandId = trimmed(record?.brandId);
   const brand = brands.find(item => item.id === brandId);
   const page = { ...record?.page };
-  if (brand) for (const field of brandFields) page[field] = brand[field];
-  return { ...record, brandId, page };
+  const identityOverrides = normalizeOverrides(record?.identityOverrides);
+  if (brand) for (const field of brandFields) if (!identityOverrides.includes(field)) page[field] = brand[field];
+  return { ...record, brandId, identityOverrides, page };
 }
 
 function cleanPage(source) {
@@ -99,6 +103,7 @@ export function prepareClientRecord(record, brands = []) {
     id: trimmed(configured.id).slice(0, 100) || uid(),
     clientName: trimmed(configured.clientName).slice(0, 120),
     brandId: configured.brandId,
+    identityOverrides: configured.identityOverrides,
     page: cleanPage(configured.page),
     updatedAt: new Date().toISOString()
   };
@@ -106,6 +111,7 @@ export function prepareClientRecord(record, brands = []) {
 
 export function validateClientRecord(record, records = [], brands = []) {
   const identityError = (field, message) => ({ field, message, tab: 'identity' });
+  if (!validOverrides(record?.identityOverrides)) return identityError('admin-brand-select', 'Revise os campos personalizados da identidade desta página.');
   const brandId = trimmed(record?.brandId);
   if (brandId && !brands.some(brand => brand.id === brandId)) return identityError('admin-brand-select', 'Escolha uma marca cadastrada ou deixe a página sem vínculo.');
   record = applyBrandToRecord(record, brands);
@@ -135,6 +141,7 @@ export function validateClientRecord(record, records = [], brands = []) {
 function isStoredRecord(record) {
   if (!isObject(record) || !trimmed(record.id) || typeof record.clientName !== 'string' || !isObject(record.page)) return false;
   if (record.brandId !== undefined && typeof record.brandId !== 'string') return false;
+  if (!validOverrides(record.identityOverrides)) return false;
   if (!validDate(record.updatedAt)) return false;
   const page = record.page;
   if (page.version !== 3 || typeof page.showBrand !== 'boolean') return false;
@@ -163,13 +170,13 @@ function recordsAreValid(records, brands = []) {
 
 function canonicalRecord(record, brands) {
   const configured = applyBrandToRecord(record, brands);
-  return { id: configured.id, clientName: configured.clientName, brandId: configured.brandId, page: clone(configured.page), updatedAt: configured.updatedAt };
+  return { id: configured.id, clientName: configured.clientName, brandId: configured.brandId, identityOverrides: configured.identityOverrides, page: { ...clone(configured.page), design: normalizeDesign(configured.page.design) }, updatedAt: configured.updatedAt };
 }
 
 function initialRecords() {
   const brand = { id: 'locytech-brand', ...Object.fromEntries(brandFields.map(field => [field, defaults[field]])), updatedAt: null };
   return {
-    records: [{ id: 'locytech-example', clientName: 'LocyTech', brandId: brand.id, page: clone(defaults), updatedAt: null }],
+    records: [{ id: 'locytech-example', clientName: 'LocyTech', brandId: brand.id, identityOverrides: [], page: clone(defaults), updatedAt: null }],
     brands: [brand], error: ''
   };
 }

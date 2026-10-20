@@ -4,7 +4,11 @@ import Modal from '../components/Modal';
 import { ProductEditor } from '../components/Editor';
 import { BrandFields, ColorsFields, LinkFields } from '../components/PageFields';
 import { BrandForm, BrandsList } from './BrandViews';
-import { categoryName, clone, contrastText, copyText, safeLogo, safeUrl, socialDefaults } from '../utils/pageState';
+import PageDesignFields from './PageDesignFields';
+import PageSurface from '../components/PageSurface';
+import Hub from '../pages/Hub';
+import { categoryName, clone, copyText, safeLogo, safeUrl } from '../utils/pageState';
+import { getTemplate } from '../utils/pageDesign';
 import { applyBrandToRecord, clientPreviewUrl, createBrandRecord, createClientRecord, loadClientRecords, persistClientRecords, prepareBrandRecord, prepareClientRecord, validateBrandRecord, validateClientRecord } from '../utils/adminState';
 import '../styles/admin.css';
 
@@ -24,18 +28,13 @@ function updatedLabel(value) {
 }
 
 function PagePreview({ page }) {
-  const logo = safeLogo(page.logo);
-  const style = { '--preview-background': page.backgroundColor, '--preview-primary': page.primaryColor, '--preview-accent': page.accentColor, '--preview-ink': contrastText(page.backgroundColor) };
   return <aside className="lv-preview-pane" aria-label="Prévia visual da página">
-    <div className="lv-preview-header"><span><Icon name="phone" size={18} />Prévia da página</span><small>Celular</small></div>
+    <div className="lv-preview-header"><span><Icon name="phone" size={18} />Prévia em tempo real</span><small>Celular</small></div>
+    <p className="lv-preview-template">{getTemplate(page.design?.templateId).name}</p>
     <div className="lv-preview-device">
-      <div className="lv-mini-page" style={style}>
-        <div className="lv-mini-profile">{logo ? <img src={logo} alt={`Logo ${page.name || 'do cliente'}`} /> : <div className="lv-mini-placeholder"><Icon name="brand" size={38} /></div>}{page.eyebrow && <small>{page.eyebrow}</small>}<h3>{page.name || 'Nome da marca'}</h3><p>{page.description || 'A apresentação do seu cliente aparece aqui.'}</p></div>
-        <div className="lv-mini-links" aria-hidden="true">{socialDefaults.map(social => <div key={social.platform}><Icon name={social.platform} size={20} /><span>{social.title}<small>{page.links.find(link => link.platform === social.platform)?.url.trim() ? 'Link configurado' : 'Adicione um link'}</small></span><Icon name="arrow" size={15} /></div>)}<div className="lv-mini-products"><Icon name="store" size={20} /><span>Nossos produtos<small>{page.products.filter(product => product.enabled).length} produtos no catálogo</small></span><Icon name="arrow" size={15} /></div></div>
-        {page.showBrand && <div className="lv-mini-footer"><Icon name="brand" size={14} />LocyTech</div>}
-      </div>
+      <div className="lv-live-preview"><PageSurface page={page} className="is-embedded"><Hub state={page} previewOnly /></PageSurface></div>
     </div>
-    <p className="lv-preview-note">Prévia visual simplificada. Use “Visualizar página” para testar a página completa e os links.</p>
+    <p className="lv-preview-note">O mesmo visual da página completa, sem links ativos nesta prévia. Use “Visualizar página” para testar no celular ou computador.</p>
   </aside>;
 }
 
@@ -143,13 +142,15 @@ export default function AdminApp() {
   }
 
   function chooseBrand(brandId) {
-    setDraft(previous => applyBrandToRecord({ ...previous, brandId }, brands));
+    setDraft(previous => applyBrandToRecord({ ...previous, brandId, identityOverrides: [] }, brands));
     setDirty(true);
     setValidation(null);
   }
 
   function saveBrand(event) {
     event.preventDefault();
+    const invalidColor = event.currentTarget.querySelector('.color-hex:invalid');
+    if (invalidColor) { invalidColor.reportValidity(); invalidColor.focus(); return; }
     if (loaded.error) { setStorageError(loaded.error); return; }
     const issue = validateBrandRecord(brandDraft, brands);
     if (issue) { setValidation(issue); return; }
@@ -164,13 +165,20 @@ export default function AdminApp() {
     setDirty(false);
     setStorageError('');
     setValidation(null);
-    toast('Marca salva. A identidade das páginas vinculadas foi atualizada neste navegador.');
+    toast('Marca salva. Páginas vinculadas atualizadas, preservando os campos personalizados.');
   }
 
   function changePage(patch) {
-    setDraft(previous => ({ ...previous, page: { ...previous.page, ...patch } }));
+    setDraft(previous => ({ ...previous, identityOverrides: previous.brandId ? [...new Set([...(previous.identityOverrides || []), ...Object.keys(patch).filter(key => ['name', 'logo', 'primaryColor', 'accentColor', 'backgroundColor'].includes(key))])] : [], page: { ...previous.page, ...patch } }));
     setDirty(true);
     setValidation(null);
+  }
+
+  function restoreBrandIdentity() {
+    setDraft(previous => applyBrandToRecord({ ...previous, identityOverrides: [] }, brands));
+    setDirty(true);
+    setValidation(null);
+    toast('Identidade da marca reaplicada nesta página. Salve para guardar.');
   }
 
   function check(record) {
@@ -181,6 +189,8 @@ export default function AdminApp() {
 
   function save(event) {
     event?.preventDefault();
+    const invalidColor = event?.currentTarget?.querySelector?.('.color-hex:invalid');
+    if (invalidColor) { invalidColor.reportValidity(); invalidColor.focus(); return; }
     if (loaded.error) { setStorageError(`${loaded.error} Use a prévia sem salvar ou verifique o armazenamento antes de continuar.`); return; }
     if (!check(draft)) return;
     const record = prepareClientRecord(draft, brands);
@@ -265,10 +275,10 @@ export default function AdminApp() {
             <div className="lv-editor-tabs" role="group" aria-label="Etapas do cadastro">{steps.map((item, index) => <button key={item.id} type="button" className={step === item.id ? 'is-active' : ''} aria-pressed={step === item.id} aria-controls={`lv-panel-${item.id}`} onClick={() => { setStep(item.id); setValidation(null); }}><span>{index + 1}</span>{item.label}</button>)}</div>
             <div className="lv-panel-body" id={`lv-panel-${step}`}><span className="lv-panel-step"><Icon name={activeStep.icon} size={18} />ETAPA {steps.findIndex(item => item.id === step) + 1} DE 4</span><h2>{activeStep.title}</h2><p className="lv-panel-description">{activeStep.description}</p>{validation && <p className="lv-error" role="alert">{validation.message}</p>}
               {step === 'identity' && <><div className="field"><label htmlFor="admin-client-name">Nome do cliente <span>*</span></label><input id="admin-client-name" maxLength={80} value={draft.clientName} placeholder="Empresa ou nome do cliente" onChange={event => { setDraft(previous => ({ ...previous, clientName: event.target.value })); setDirty(true); setValidation(null); }} /><small>Identificação interna. Não aparece no link de demonstração.</small></div>
-                <div className="field"><label htmlFor="admin-brand-select">Marca vinculada</label><select id="admin-brand-select" value={draft.brandId || ''} onChange={event => chooseBrand(event.target.value)}><option value="">Sem marca vinculada — personalizar nesta página</option>{brands.map(brand => <option key={brand.id} value={brand.id}>{brand.name}</option>)}</select><small>Ao vincular, o nome, a logo e as cores vêm do cadastro da marca. Textos, links e produtos continuam próprios desta página.</small></div>
-                {linkedBrand ? <div className="lv-linked-brand"><div className="lv-client-avatar">{safeLogo(linkedBrand.logo) ? <img src={safeLogo(linkedBrand.logo)} alt="" /> : <Icon name="brand" />}</div><div><strong>{linkedBrand.name}</strong><p>Identidade vinculada à marca</p><button type="button" className="text-button" onClick={() => openBrand(linkedBrand)}>Editar cadastro da marca<Icon name="arrow" size={15} /></button></div></div> : <p className="lv-brand-tip">Você também pode cadastrar uma identidade na aba <button type="button" className="text-button" onClick={() => showList('brands')}>Marcas</button> e vinculá-la aqui depois.</p>}
-                <div className="lv-form-divider" /><BrandFields key={`${draft.id}-${draft.brandId || 'custom'}`} state={draft.page} onChange={changePage} toast={toast} prefix="admin-" hideLogo={Boolean(linkedBrand)} hideName={Boolean(linkedBrand)} /></>}
-              {step === 'appearance' && <>{linkedBrand && <div className="lv-linked-palette-note"><Icon name="links" size={19} /><p>Paleta da marca <strong>{linkedBrand.name}</strong>. Para alterar as cores, edite o cadastro em Marcas.</p><button type="button" className="lv-btn lv-btn-secondary lv-btn-small" onClick={() => openBrand(linkedBrand)}>Editar marca</button></div>}<ColorsFields state={draft.page} onChange={changePage} prefix="admin-" lockColors={Boolean(linkedBrand)} /><div className="lv-summary"><Icon name="palette" size={22} /><div><strong>Uma identidade que acompanha a marca.</strong><p>A cor principal destaca os botões; a de destaque valoriza os produtos. A imagem da logo mantém suas cores originais.</p></div></div></>}
+                <div className="field"><label htmlFor="admin-brand-select">Marca vinculada</label><select id="admin-brand-select" value={draft.brandId || ''} onChange={event => chooseBrand(event.target.value)}><option value="">Sem marca vinculada — personalizar nesta página</option>{brands.map(brand => <option key={brand.id} value={brand.id}>{brand.name}</option>)}</select><small>A marca fornece a identidade inicial. Você pode personalizar nome, logo e cores abaixo sem alterar outras páginas. Escolher outra marca reaplica sua identidade.</small></div>
+                {linkedBrand ? <div className="lv-linked-brand"><div className="lv-client-avatar">{safeLogo(linkedBrand.logo) ? <img src={safeLogo(linkedBrand.logo)} alt="" /> : <Icon name="brand" />}</div><div><strong>Marca: {linkedBrand.name}</strong><p>{draft.identityOverrides?.length ? `${draft.identityOverrides.length} campos de identidade personalizados nesta página.` : 'Usando a identidade da marca. Edição livre abaixo.'}</p><div className="lv-brand-identity-actions"><button type="button" className="text-button" onClick={() => openBrand(linkedBrand)}>Editar marca central<Icon name="arrow" size={15} /></button>{Boolean(draft.identityOverrides?.length) && <button type="button" className="text-button" onClick={restoreBrandIdentity}>Usar identidade da marca</button>}</div></div></div> : <p className="lv-brand-tip">Você também pode cadastrar uma identidade na aba <button type="button" className="text-button" onClick={() => showList('brands')}>Marcas</button> e vinculá-la aqui depois.</p>}
+                <div className="lv-form-divider" /><BrandFields key={`${draft.id}-${draft.brandId || 'custom'}`} state={draft.page} onChange={changePage} toast={toast} prefix="admin-" /></>}
+              {step === 'appearance' && <>{linkedBrand && <div className="lv-linked-palette-note"><Icon name="palette" size={19} /><p><strong>Cores livres nesta página.</strong> Suas alterações não mudam a marca central nem as outras páginas.</p>{Boolean(draft.identityOverrides?.length) && <button type="button" className="lv-btn lv-btn-secondary lv-btn-small" onClick={restoreBrandIdentity}>Usar identidade da marca</button>}</div>}<ColorsFields state={draft.page} onChange={changePage} prefix="admin-" /><PageDesignFields page={draft.page} onChange={changePage} /></>}
               {step === 'links' && <><LinkFields state={draft.page} onChange={changePage} prefix="admin-" /><div className="lv-summary"><Icon name="links" size={22} /><div><strong>Quatro opções, uma só página.</strong><p>Instagram, WhatsApp e LinkedIn abrem os endereços configurados. Nossos produtos abre o catálogo. Deixe um canal vazio se ainda não tiver o link.</p></div></div></>}
               {step === 'products' && <CatalogFields page={draft.page} onEdit={id => setModal({ type: 'product', id })} onAction={productAction} />}
             </div>
@@ -283,7 +293,7 @@ export default function AdminApp() {
     {modal?.type === 'product' && <ProductEditor product={draft.page.products.find(item => item.id === modal.id)} onClose={() => setModal(null)} onSave={saveProduct} />}
     {modal && ['share', 'help', 'discard', 'remove-product'].includes(modal.type) && <Modal id="lv-dialog" className="modal lv-dialog" labelledBy="lv-dialog-title" onClose={() => setModal(null)}><div className="modal-topline"><span className="modal-eyebrow">LOCYVIEW</span><button type="button" className="icon-button" aria-label="Fechar janela" onClick={() => setModal(null)}><Icon name="close" /></button></div>
       {modal.type === 'share' && <><h2 id="lv-dialog-title">Página de demonstração</h2><p className="modal-description">Este link abre uma cópia de “{modal.name}”, sem os dados internos do cadastro.</p><label className="field-label" htmlFor="lv-share-url">Link de demonstração</label><textarea className="lv-share-link" id="lv-share-url" ref={shareRef} value={modal.url} readOnly rows={4} /><p className="lv-panel-description">Não é uma publicação em servidor. O link contém esta versão da página e não acompanha alterações futuras. Gere um novo link depois de editar.</p><div className="modal-actions"><button type="button" className="lv-btn lv-btn-secondary" onClick={copyLink}><Icon name="copy" size={18} />Copiar link</button><a className="lv-btn lv-btn-primary" href={modal.url} target="_blank" rel="noopener noreferrer">Abrir demonstração<Icon name="external" size={18} /></a></div></>}
-      {modal.type === 'help' && <><h2 id="lv-dialog-title">Da marca à página.</h2><p className="modal-description">1. Na aba Marcas, cadastre nome, logo e cores.<br />2. Crie a página do cliente e escolha uma marca.<br />3. Adicione textos, links e produtos e confira a prévia.<br />4. Salve neste navegador e gere um link de demonstração.</p><p className="modal-description">Editar uma marca atualiza a identidade das páginas vinculadas salvas neste navegador. Links de demonstração já gerados continuam sendo cópias daquela versão.</p><div className="lv-summary"><Icon name="info" /><p>Esta versão contém somente o front-end. Não há login, servidor, sincronização entre aparelhos ou cadastro centralizado. Não use o painel para guardar dados sigilosos. A conexão com a API será uma etapa futura.</p></div></>}
+      {modal.type === 'help' && <><h2 id="lv-dialog-title">Da marca à página.</h2><p className="modal-description">1. Na aba Marcas, cadastre nome, logo e cores.<br />2. Crie a página do cliente e escolha uma marca.<br />3. Personalize a identidade, escolha um dos 24 modelos e organize seus canais.<br />4. Adicione produtos, confira a prévia e salve neste navegador.</p><p className="modal-description">Você pode trocar nome, logo e cores só desta página. Esses campos personalizados são preservados quando a marca muda. Use “Usar identidade da marca” para voltar aos padrões. Links de demonstração já gerados continuam sendo cópias daquela versão.</p><div className="lv-summary"><Icon name="info" /><p>Esta versão contém somente o front-end. Não há login, servidor, sincronização entre aparelhos ou cadastro centralizado. Não use o painel para guardar dados sigilosos. A conexão com a API será uma etapa futura.</p></div></>}
       {modal.type === 'discard' && <><h2 id="lv-dialog-title">Sair sem salvar?</h2><p className="modal-description">As alterações desta edição serão descartadas. O último cadastro salvo continuará no navegador.</p><div className="modal-actions"><button type="button" className="lv-btn lv-btn-secondary" onClick={() => setModal(null)}>Continuar editando</button><button type="button" className="lv-btn lv-btn-primary" onClick={() => { const action = modal.action; setModal(null); setDirty(false); action(); }}>Descartar alterações</button></div></>}
       {modal.type === 'remove-product' && <><h2 id="lv-dialog-title">Remover este produto?</h2><p className="modal-description">“{modal.name}” sairá do catálogo desta edição. A mudança só será guardada quando você salvar a página.</p><div className="modal-actions"><button type="button" className="lv-btn lv-btn-secondary" onClick={() => setModal(null)}>Cancelar</button><button type="button" className="lv-btn lv-btn-primary" onClick={() => { changePage({ products: draft.page.products.filter(item => item.id !== modal.id) }); setModal(null); }}>Remover produto</button></div></>}
     </Modal>}

@@ -1,3 +1,5 @@
+import { normalizeDesign } from './pageDesign';
+
 export const STORAGE_KEY = 'locytech-hub:v3';
 export const LEGACY_STORAGE_KEY = 'locytech-catalog:v2';
 export const DEFAULT_LOGO = '/assets/locytech-hd.png';
@@ -20,6 +22,7 @@ export const defaults = {
   primaryColor: '#4d8dff',
   accentColor: '#f4cf46',
   backgroundColor: '#080f20',
+  design: normalizeDesign(),
   showBrand: true,
   products: [
     { id: 'landing-page', icon: 'window', category: 'landing', title: 'Landing page', description: 'Página para apresentar uma oferta, captar contatos e divulgar campanhas.', note: 'Campanhas e lançamentos', price: 'R$ 0,00', features: ['Layout para a sua campanha', 'Apresentação da oferta e chamadas para ação', 'Versão para celular e computador', 'Links para os seus canais de contato'], enabled: true },
@@ -129,6 +132,7 @@ export function normalize(source, { migrateDefaults = true } = {}) {
     primaryColor: color(palette.primaryColor, defaults.primaryColor),
     accentColor: color(palette.accentColor, defaults.accentColor),
     backgroundColor: color(palette.backgroundColor, defaults.backgroundColor),
+    design: normalizeDesign(source.design),
     showBrand: source.showBrand !== false,
     products: (Array.isArray(source.products) ? source.products : defaults.products).slice(0, 30).map(raw => {
       const product = raw && typeof raw === 'object' ? raw : {};
@@ -181,6 +185,7 @@ export function publicSnapshot(state) {
     primaryColor: state.primaryColor,
     accentColor: state.accentColor,
     backgroundColor: state.backgroundColor,
+    design: normalizeDesign(state.design),
     showBrand: state.showBrand,
     products: state.products.filter(product => product.enabled).map(({ icon, category, title, description, note, price, features }) => ({ icon, category, title, description, note, price, features })),
     links: socialDefaults.map(social => ({ platform: social.platform, title: social.title, url: safeUrl(state.links.find(link => link.platform === social.platform)?.url) }))

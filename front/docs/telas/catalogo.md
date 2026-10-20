@@ -24,7 +24,7 @@ Produto contém `id`, `icon`, `category`, `title`, `description`, `note`, `price
 
 O modelo LocyTech possui Landing page, Site institucional, Loja virtual, Site para profissionais e Página de links, todos com R$ 0,00. Novas páginas começam sem produtos. O zero não anuncia serviço gratuito: preços são ilustrativos e dependem do escopo. Cadastros são normalizados sem migrações dos preços antigos.
 
-Produtos pertencem à página, não à marca central. Alterar nome, logo ou cores de uma marca não modifica catálogo, links, textos ou identificador da página.
+Produtos pertencem à página, não à marca central. Alterar nome, logo ou cores de uma marca não modifica catálogo, links, textos, identificador ou visual da página. A biblioteca de modelos altera só `design`, preservando o catálogo. Nossos produtos pode mudar de posição entre os quatro atalhos conforme a ordem configurada, mas continua abrindo o catálogo somente por clique.
 
 Os dados do orçamento ficam temporariamente no diálogo, não no cadastro ou snapshot. O modelo de prévia não representa contratação, pagamento ou envio.
 
@@ -35,7 +35,7 @@ Os dados do orçamento ficam temporariamente no diálogo, não no cadastro ou sn
 - Não anunciar envio, contratação, integração ou publicação inexistentes.
 - `quoteDestinations` aceita telefone válido de WhatsApp em `wa.me` ou `api.whatsapp.com/send`.
 - Não salvar dados do solicitante no cadastro ou snapshot.
-- Não propagar catálogo entre páginas por uma alteração de marca.
+- Não propagar catálogo entre páginas por uma alteração de marca ou escolha de modelo visual.
 
 ## O que revisar antes de alterar
 

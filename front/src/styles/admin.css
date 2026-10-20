@@ -335,6 +335,14 @@
 .lv-admin .lv-linked-palette-note p { flex: 1; min-width: 140px; margin: 0; color: #b4cbe9; font-size: 13px; line-height: 1.8; }
 .lv-admin .lv-linked-palette-note .lv-btn { margin-left: auto; }
 .lv-admin .color-hex[readonly] { color: #b2c5e0; cursor: default; }
+.lv-admin .lv-preview-template { margin: -6px 0 14px; color: #94b7e8; font-size: 12px; }
+.lv-admin .lv-live-preview { max-height: 720px; overflow: auto; border-radius: 18px; scrollbar-width: thin; scrollbar-color: #38577d transparent; }
+.lv-admin .lv-live-preview .hub-card:disabled { opacity: 1; cursor: default; }
+.lv-admin .lv-brand-identity-actions { display: flex; align-items: center; flex-wrap: wrap; column-gap: 20px; }
+.lv-admin .lv-color-error { color: #ffb7c7 !important; grid-column: 1 / -1; }
+.lv-admin input.color-hex[aria-invalid='true'] { border-color: #cf7087; }
+.lv-admin .color-option input.color-hex { min-height: 44px; font-size: 14px; }
+.lv-admin .logo-upload .button { min-height: 44px; }
 
 @media (max-width: 1150px) {
   .lv-admin .lv-brands-grid { grid-template-columns: minmax(0, 1fr); }
