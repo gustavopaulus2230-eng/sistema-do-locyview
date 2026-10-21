@@ -21,6 +21,7 @@ O menu administrativo contém Páginas dos clientes e Marcas. O primeiro organiz
 - `src/utils/adminState.js`: esquema administrativo, vínculos, validação e persistência.
 - `src/components/PageFields.jsx`: marca, textos, logo, cores e canais.
 - `src/components/Editor.jsx`: formulário de produto reutilizado.
+- `src/components/ProductPriceFields.jsx` e `src/utils/productPricing.js`: controles compartilhados, validação e formatação de preço.
 - `src/components/ProductDetails.jsx`: apresentação compartilhada dos detalhes do produto.
 - `src/App.jsx`: modelo de prévia, navegação, detalhes e orçamento.
 - `src/pages/Hub.jsx` e `src/pages/Products.jsx`: canais e catálogo do modelo.
@@ -48,6 +49,8 @@ O esquema público versão 3 contém marca, textos, identificador, logo, três c
 O estado de navegação, o produto selecionado, o filtro e a largura de prévia não fazem parte do cadastro. O catálogo fica montado e oculto ao mudar de tela, mantendo o filtro; os detalhes consultam o produto pelo identificador a cada render. Produto removido ou ocultado depois da seleção retorna ao catálogo com aviso. A inspeção explícita de um item já oculto é permitida somente na prévia administrativa e informa esse estado.
 
 `ProductEditor` mantém um rascunho próprio e, com `previewPage`, usa `ProductDetails` para apresentá-lo enquanto se digita. O item novo tem identificador estável; nome ausente é permitido na visualização e validado ao salvar. Salvar produto só aplica os dados ao rascunho da página, e Salvar página persiste o conjunto local. Não há formulário ou diálogo aninhado para os detalhes. Em telas estreitas, controles alternam Dados do produto e Ver produto; em telas largas, edição e apresentação ficam lado a lado.
+
+A ação Ajustar preço da linha do catálogo abre o mesmo `ProductEditor` com `initialFocus="price"`, ocultando os demais campos e mantendo a prévia completa. Aplicar preço apenas atualiza o rascunho. `ProductPriceFields` e `productPricing.js` são reutilizados também na edição completa para Preço fixo, A partir de, Sob consulta e Texto personalizado. Valores em reais aceitam zero e até duas casas decimais; entrada inválida bloqueia a aplicação e conserva o último preço válido nos detalhes. O estado dos controles é transitório: `product.price` continua uma string de até 40 caracteres, com condições existentes preservadas, sem mudança das versões pública ou administrativa e sem migração dos cadastros.
 
 `clientPreviewUrl` usa a origem atual e gera `/preview#p=` com dados sanitizados. Nome administrativo, datas, vínculo interno, `identityOverrides` e dados de orçamento não entram no snapshot; o visual normalizado é incluído. Uma marca vinculada é resolvida antes da geração. A prévia é somente leitura, sem controles antigos de edição, sem consultar cadastros posteriores e sem carregar dados administrativos em um link inválido.
 
@@ -77,6 +80,7 @@ Não há destino GitHub novo configurado nesta entrega. O repositório LocyView 
 - Preservar a ordem dos canais ao aplicar modelo e reutilizar catálogo/detalhes nas prévias, sem bloquear sua navegação.
 - Permitir conferir o rascunho antes da validação para salvar; bloquear contatos externos e qualquer gravação na superfície de prévia administrativa.
 - Preservar migração sem vínculo automático e estados vazios.
+- Manter preços textuais e o ajuste rápido no formulário compartilhado; aplicar somente valores válidos ao rascunho e persistir somente ao salvar a página.
 - Não compartilhar dados administrativos, orçamento ou segredos.
 - Manter armazenamento local explícito e avisos de falha honestos.
 - Não usar emojis; reutilizar componentes e SVGs.
@@ -89,6 +93,7 @@ Não há destino GitHub novo configurado nesta entrega. O repositório LocyView 
 - Conferir 24 modelos, ajustes, ordem dos canais, cores claras/escuras, HEX inválido e equivalência da prévia.
 - Conferir três abas de design, barra de ações, prévia lateral/ampliada, filtro preservado e detalhes de item alterado, oculto ou removido.
 - Conferir produto durante a digitação e fechamento da prévia sem perder o rascunho da página.
+- Conferir ajuste rápido e edição completa de preço, quatro modos, zero, condições existentes, validação, cancelamento, salvamento local e snapshot.
 - Conferir limites, validação, versão 1, listas vazias e falhas de armazenamento.
 - Abrir as rotas diretamente e recarregar; testar snapshot sem campos administrativos.
 - Conferir celular, computador, teclado e diálogos.
@@ -103,6 +108,9 @@ Não há destino GitHub novo configurado nesta entrega. O repositório LocyView 
 - [Designer de páginas](../src/admin/PageDesignFields.jsx)
 - [Prévia interativa](../src/admin/LivePreview.jsx)
 - [Detalhes compartilhados do produto](../src/components/ProductDetails.jsx)
+- [Campos compartilhados de preço](../src/components/ProductPriceFields.jsx)
+- [Validação e formatação de preço](../src/utils/productPricing.js)
+- [Estilos dos campos de preço](../src/styles/priceFields.css)
 - [Estilos da prévia e do editor de produto](../src/styles/livePreview.css)
 - [Presets e validação de visual](../src/utils/pageDesign.js)
 - [Renderizador compartilhado](../src/components/PageSurface.jsx)

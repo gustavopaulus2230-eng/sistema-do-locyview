@@ -18,6 +18,8 @@ O estúdio organiza visual em Modelos, Ajustes e Organização. Aplicar um model
 
 Ver prévia e Gerar link são ações separadas. A prévia ao vivo acompanha o rascunho; o snapshot é uma cópia fixa. `ProductEditor` com `previewPage` apresenta o produto ainda em edição, sem diálogo ou formulário aninhado e sem persistir antes de Salvar produto/Salvar página. Preservar o diálogo nativo, seus títulos acessíveis e identificadores únicos entre prévias simultâneas.
 
+Ajustar preço reutiliza `ProductEditor` focado no preço, com Aplicar preço alterando somente o rascunho. Reutilizar `ProductPriceFields` e `productPricing.js` nos modos Preço fixo, A partir de, Sob consulta e Texto personalizado. Aceitar zero, rejeitar valores inválidos e conservar o último preço válido na prévia. `product.price` continua texto de até 40 caracteres, sem migração ou nova versão de armazenamento; preservar condições já cadastradas. Somente Salvar página persiste o ajuste.
+
 Não misturar nome administrativo, datas, vínculo interno, `identityOverrides` ou orçamento nos snapshots; incluir o visual normalizado. `#p=` contém uma versão pública, não um endereço curto, publicação sincronizada ou link revogável. Alterações de marcas e páginas afetam somente cadastros locais, nunca snapshots antigos ou o primeiro site. Não guardar informações sigilosas nem pedir senhas ou tokens.
 
 O modelo mantém quatro atalhos e catálogo aberto por clique. Preços ilustrativos, inclusive R$ 0,00, não anunciam serviço gratuito. Não exibir controles antigos de edição no modelo de prévia, inventar clientes, métricas ou envio de orçamento.
@@ -34,6 +36,8 @@ A porta local é 4174. Vite gera `build/` na raiz; dependências, build e arquiv
 - [Designer de páginas](front/src/admin/PageDesignFields.jsx)
 - [Prévia interativa](front/src/admin/LivePreview.jsx)
 - [Detalhes compartilhados](front/src/components/ProductDetails.jsx)
+- [Campos de preço](front/src/components/ProductPriceFields.jsx)
+- [Validação e formatação de preço](front/src/utils/productPricing.js)
 - [Modelos e validação de visual](front/src/utils/pageDesign.js)
 - [Renderizador compartilhado](front/src/components/PageSurface.jsx)
 - [Estado administrativo](front/src/utils/adminState.js)

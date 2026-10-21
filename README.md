@@ -20,6 +20,7 @@ Não há novo destino GitHub configurado para este painel. O repositório fornec
 - Cores livres, seletor e HEX funcionais, com prévia imediata e contraste calculado.
 - Textos, identificador, assinatura, links e produtos próprios de cada página.
 - Catálogo com edição, ordenação, visibilidade e remoção de itens.
+- Ajustar preço direto em cada produto, com Preço fixo, A partir de, Sob consulta ou Texto personalizado, validação em reais e prévia ao vivo.
 - Prévia interativa de página, catálogo e detalhes, antes de salvar ou completar a identidade, com ampliação para celular e computador.
 - Ver catálogo e Ver produto diretos, além de detalhes do produto acompanhando a digitação no formulário.
 - Barra de ações para visualizar/salvar e geração separada de link de demonstração com uma versão fixa da página.
@@ -45,6 +46,8 @@ Editar uma marca atualiza somente nome, logo e cores ainda herdados pelas págin
 
 A prévia administrativa usa o rascunho ao vivo, permite navegar entre página, catálogo e detalhes e não altera cadastros. Contatos externos mostram um aviso sem abrir outra plataforma. Editar um produto mostra sua apresentação antes de aplicar os dados; Salvar produto atualiza o rascunho, e Salvar página continua sendo a gravação local.
 
+Ajustar preço abre o mesmo formulário focado somente no valor. Aplicar preço altera o rascunho; Salvar página guarda o ajuste neste navegador. Zero é aceito, entradas inválidas são rejeitadas e condições personalizadas são preservadas. Os preços continuam em texto, sem migração dos cadastros existentes.
+
 O link de demonstração contém dados públicos da versão gerada. Inclui o visual escolhido, mas não nome administrativo, datas, vínculo interno, `identityOverrides` ou orçamento. Não atualiza sozinho, não cria endereço curto e não permite revogação. Não use o painel para informações sigilosas.
 
 A rota administrativa não é uma proteção por login. Não há exclusão de marcas ou páginas nesta entrega, envio de mensagens, cadastro centralizado ou integração com servidor.
@@ -69,6 +72,8 @@ A rota administrativa não é uma proteção por login. Não há exclusão de ma
 - [Designer de páginas](front/src/admin/PageDesignFields.jsx)
 - [Prévia interativa](front/src/admin/LivePreview.jsx)
 - [Detalhes compartilhados do produto](front/src/components/ProductDetails.jsx)
+- [Campos compartilhados de preço](front/src/components/ProductPriceFields.jsx)
+- [Validação e formatação de preço](front/src/utils/productPricing.js)
 - [Estilos da prévia e do editor de produto](front/src/styles/livePreview.css)
 - [Modelos e validação](front/src/utils/pageDesign.js)
 - [Renderizador compartilhado](front/src/components/PageSurface.jsx)

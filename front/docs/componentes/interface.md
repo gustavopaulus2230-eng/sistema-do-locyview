@@ -25,10 +25,12 @@ Padronizar formulários e diálogos do painel LocyView independente e do seu mod
 - `src/utils/pageDesign.js`.
 - `src/components/PageFields.jsx`.
 - `src/components/Editor.jsx`.
+- `src/components/ProductPriceFields.jsx` e `src/utils/productPricing.js`.
 - `src/components/BrandAtmosphere.jsx`.
 - `src/components/Icon.jsx`.
 - `src/components/Modal.jsx`.
 - `src/styles/admin.css`, `src/styles/designer.css`, `src/styles/livePreview.css`, `src/styles/pageDesign.css` e `src/styles/global.css`.
+- `src/styles/priceFields.css`.
 - `public/assets/locytech-hd.png` e `public/assets/locytech.png`.
 
 ## Modelo de dados / fluxo
@@ -49,6 +51,10 @@ O asset foi restaurado pela ferramenta integrada de imagem, preservando pavão/c
 
 `ProductDetails` é apresentacional e recebe `onQuote` somente no modelo público. `ProductEditor` usa o mesmo conteúdo para exibir seu rascunho com `previewPage`, sem abrir outro diálogo ou formulário aninhado. Em telas estreitas, Dados do produto e Ver produto alternam as áreas; com largura suficiente, ambas aparecem lado a lado. O item novo mantém identificador estável, e título ausente é permitido na prévia, não no salvamento.
 
+`ProductPriceFields` é controlado por um rascunho transitório com `mode`, `amount` e `text`. Reúne os modos Preço fixo, A partir de, Sob consulta e Texto personalizado, campos com rótulos e identificadores únicos, teclado decimal para valores em reais, resumo e mensagens de erro acessíveis. `priceDraftFromString` reconhece valores existentes sem converter condições livres em números; `priceResult` valida e devolve a string pública. Os modos não são armazenados no produto. Alterar o modo conserva os campos transitórios, e entrada inválida não substitui o último preço válido do rascunho apresentado por `ProductDetails`.
+
+`ProductEditor` com `initialFocus="price"` e produto existente funciona como ajuste rápido: oculta os demais campos, foca o preço e oferece Aplicar preço. No celular, Preço do produto e Ver produto alternam as áreas desse modo. Uma falha na aplicação volta aos controles e foca o campo inválido. Na edição completa, o título continua sendo o foco inicial. Aplicar preço ou Salvar produto atualiza somente o rascunho da página; fechar ou cancelar descarta a edição ainda não aplicada.
+
 `Modal` usa `dialog`, trava a rolagem de fundo e permite Escape e clique fora. Seu nome acessível vem do título associado. Captura o elemento disparador antes dos efeitos dos filhos e, ao desmontar, restaura o foco sem rolar a página se o disparador ainda existir. A restauração aguarda a limpeza e não rouba o foco de outro diálogo aberto nem de um destino definido durante o fechamento. `Icon` é decorativo; ações possuem rótulos textuais.
 
 ## Regras críticas
@@ -62,6 +68,7 @@ O asset foi restaurado pela ferramenta integrada de imagem, preservando pavão/c
 - Aplicar modelos e ajustes somente em `design`, sem substituir cores ou conteúdo.
 - Manter a prévia e o modelo completo usando `PageSurface`.
 - Reutilizar catálogo e detalhes; permitir navegação administrativa sem links externos, orçamento ou mutação dos dados.
+- Compartilhar os campos de preço entre ajuste rápido e edição completa, preservando texto existente, último preço válido na prévia e foco acessível em erros.
 
 ## O que revisar antes de alterar
 
@@ -70,6 +77,7 @@ O asset foi restaurado pela ferramenta integrada de imagem, preservando pavão/c
 - Conferir troca de logo com leitura pendente e movimento reduzido.
 - Conferir cores válidas/invalidas, três e seis dígitos, galeria de 24 modelos e controles por teclado.
 - Conferir navegação de prévia, filtros, foco dos títulos, ampliação, produto oculto/removido e detalhes durante a digitação.
+- Conferir quatro modos de preço, formatos em reais, zero, valores inválidos, resumo, foco e aplicação/cancelamento nos dois fluxos de produto.
 - Testar celular e computador sem overflow horizontal.
 
 ## Código relacionado
@@ -86,6 +94,9 @@ O asset foi restaurado pela ferramenta integrada de imagem, preservando pavão/c
 - [Estilos dos modelos](../../src/styles/pageDesign.css)
 - [Campos reutilizados](../../src/components/PageFields.jsx)
 - [Formulário de produto](../../src/components/Editor.jsx)
+- [Campos de preço](../../src/components/ProductPriceFields.jsx)
+- [Leitura, validação e formatação de preço](../../src/utils/productPricing.js)
+- [Estilos dos campos de preço](../../src/styles/priceFields.css)
 - [Identidade da prévia](../../src/components/BrandAtmosphere.jsx)
 - [Ícones](../../src/components/Icon.jsx)
 - [Diálogo](../../src/components/Modal.jsx)

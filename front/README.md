@@ -22,6 +22,7 @@ Em `front/`, execute `npm install` na preparação inicial e `npm run dev` para 
 - Modelos preservam marca, paleta e conteúdo; fundos claros ou escuros mantêm contraste calculado.
 - Textos, identificador, assinatura, links e catálogo continuam específicos da página.
 - Catálogo: até 30 produtos por página, com edição, ordenação, visibilidade e remoção confirmada.
+- Ajustar preço por produto, com quatro modos, validação em reais, zero e condições personalizadas; os mesmos campos estão na edição completa.
 - Prévia interativa de página, catálogo e detalhes, lateral ou ampliada nas larguras Celular e Computador, antes de salvar ou completar os campos obrigatórios.
 - Ver catálogo/Ver produto abrem o resultado diretamente; o formulário de produto também acompanha a digitação com seus detalhes reais.
 - Interface responsiva por largura disponível, com teclado e controles acessíveis.
@@ -33,6 +34,8 @@ O conjunto `locyview-admin:v2` guarda marcas e páginas atomicamente no navegado
 A leitura legada versão 1 preserva identidades de páginas sem vinculá-las automaticamente a marcas. Dados versão 2 sem `identityOverrides` recebem lista vazia, e páginas sem `design` recebem o visual padrão, sem apagar cadastros ou mudar chaves. Uma lista vazia salva permanece vazia. Dados inválidos e armazenamento bloqueado impedem substituição; quota ou falha ao gravar mantém a edição aberta.
 
 A prévia administrativa acompanha o rascunho atual, permite navegar e filtrar e não grava dados. Contatos externos são apenas inspecionados por aviso; não há envio ou orçamento nessa superfície. No editor de produto, Salvar produto aplica o item ao rascunho da página, mas a gravação local ainda depende de Salvar página.
+
+Ajustar preço reutiliza o editor de produto focado nos controles de Preço fixo, A partir de, Sob consulta e Texto personalizado, com resumo e prévia completa. Aplicar preço atualiza somente o rascunho. Entrada inválida impede a aplicação e conserva o último valor válido nos detalhes. `product.price` permanece texto de até 40 caracteres, preservando condições anteriores sem migração de esquema ou armazenamento.
 
 Gerar link é uma ação separada. O snapshot contém dados públicos sanitizados e visual normalizado, não nome administrativo, datas, vínculo interno ou `identityOverrides`. O link guarda uma versão, não cria rota curta, não acompanha edições futuras e não tem revogação. A atualização de uma marca não altera snapshots antigos. Não incluir dados sigilosos.
 
@@ -61,6 +64,8 @@ A hospedagem deste sistema é `https://locyview-painel.locytech.chatgpt.site`. �
 - [Designer de páginas](src/admin/PageDesignFields.jsx)
 - [Prévia interativa](src/admin/LivePreview.jsx)
 - [Detalhes compartilhados do produto](src/components/ProductDetails.jsx)
+- [Campos compartilhados de preço](src/components/ProductPriceFields.jsx)
+- [Validação e formatação de preço](src/utils/productPricing.js)
 - [Estilos da prévia e do editor de produto](src/styles/livePreview.css)
 - [Modelos e normalização](src/utils/pageDesign.js)
 - [Renderizador compartilhado](src/components/PageSurface.jsx)

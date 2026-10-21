@@ -8,6 +8,8 @@ Configurar produtos dos clientes e testar sua apresentação no modelo deste pai
 
 A etapa Produtos permite criar, editar, ordenar, ocultar e remover itens. Ver catálogo e Ver produto abrem diretamente a prévia administrativa, sem gerar link ou exigir cadastro completo. A prévia lateral também navega de Nossos produtos para o catálogo e os detalhes. Filtros Todos, Landing pages e Sites mostram produtos habilitados.
 
+Cada item oferece Ajustar preço, que abre o mesmo `ProductEditor` em modo focado no valor, sem alterar os demais dados. A edição completa também usa os mesmos controles de preço, com resumo de como o valor será apresentado e detalhes do produto ao vivo.
+
 `ProductDetails` apresenta descrição, itens e preço tanto no painel quanto em `/preview#p=`. No snapshot, cada cartão abre os detalhes em um diálogo e Solicitar orçamento abre `QuoteDialog`. A prévia administrativa usa detalhes dentro da própria superfície, sem outro diálogo nem ação de orçamento.
 
 O orçamento apenas prepara uma mensagem para copiar. WhatsApp aparece somente com destino válido configurado; e-mail depende de `mailto:`. Nenhuma mensagem é enviada automaticamente.
@@ -16,6 +18,8 @@ O orçamento apenas prepara uma mensagem para copiar. WhatsApp aparece somente c
 
 - `src/admin/AdminApp.jsx`: edição e operações do catálogo.
 - `src/components/Editor.jsx`: formulário de produto.
+- `src/components/ProductPriceFields.jsx`: controles e resumo de preço.
+- `src/utils/productPricing.js`: leitura de preços existentes, validação e formatação em reais.
 - `src/pages/Products.jsx`: apresentação e filtros.
 - `src/admin/LivePreview.jsx`: catálogo e detalhes administrativos.
 - `src/components/ProductDetails.jsx`: conteúdo compartilhado dos detalhes.
@@ -27,6 +31,10 @@ O orçamento apenas prepara uma mensagem para copiar. WhatsApp aparece somente c
 Produto contém `id`, `icon`, `category`, `title`, `description`, `note`, `price`, `features` e `enabled`. O limite é de 30 produtos e oito itens em `features` por produto. Alterações só persistem quando a página é salva; excluir um produto pede confirmação. Não há exclusão de marcas ou páginas nesta entrega.
 
 `ProductEditor` aceita `previewPage` e mostra o produto em edição com o tema da página. A apresentação acompanha título, descrição, categoria, ícone, valor, complemento e itens, mesmo antes de salvar e antes de haver título. O identificador do novo item fica estável durante a edição. Salvar produto valida o título e aplica o item ao rascunho; somente Salvar página grava o catálogo no navegador.
+
+O preço oferece Preço fixo, A partir de, Sob consulta e Texto personalizado. Valores numéricos aceitam reais com até duas casas decimais, inclusive zero, e são formatados como `R$ 1.500,00` ou `A partir de R$ 1.500,00`. Negativos, entradas inválidas e valores acima de R$ 999.999.999,99 impedem a aplicação. Enquanto houver erro, os detalhes conservam o último preço válido. Texto personalizado aceita até 40 caracteres; condições já cadastradas, como mensalidade, continuam em texto livre quando não são um preço numérico reconhecido.
+
+`initialFocus="price"` abre o ajuste rápido de um produto existente, com foco no controle de preço, botão Aplicar preço e prévia completa. Aplicar preço altera somente o rascunho da página; é necessário Salvar página para persistir. `price` continua sendo uma string no esquema público e administrativo, sem nova versão, campos persistidos de modo ou migração dos cadastros.
 
 Cancelar ou fechar o formulário de produto descarta a edição ainda não aplicada. A prévia em si não adiciona o produto ao catálogo nem grava dados.
 
@@ -47,6 +55,8 @@ Os dados do orçamento ficam temporariamente no diálogo, não no cadastro ou sn
 - `quoteDestinations` aceita telefone válido de WhatsApp em `wa.me` ou `api.whatsapp.com/send`.
 - Não salvar dados do solicitante no cadastro ou snapshot.
 - Não propagar catálogo entre páginas por uma alteração de marca ou escolha de modelo visual.
+- Reutilizar os controles de preço na edição completa e no ajuste rápido; rejeitar valores inválidos sem substituir o último preço válido ou gravar parcialmente.
+- Preservar `product.price` textual, condições personalizadas e a normalização administrativa sem migração de valores antigos.
 
 ## O que revisar antes de alterar
 
@@ -54,6 +64,8 @@ Os dados do orçamento ficam temporariamente no diálogo, não no cadastro ou sn
 - Conferir filtros, contagens e catálogo vazio.
 - Validar descrições, itens e preços nos detalhes.
 - Conferir o produto durante a digitação, alternar Dados do produto/Ver produto no celular e validar título ao salvar.
+- Conferir Ajustar preço, os quatro modos, zero, centavos, milhar, texto existente, entrada negativa/inválida e retorno do foco ao campo com erro.
+- Cancelar o ajuste sem modificar o item; aplicar um preço e conferir lista, detalhes, salvamento da página e snapshot.
 - Conferir filtro preservado ao voltar dos detalhes, item oculto com aviso e item removido sem detalhe antigo.
 - Testar campos do orçamento e aviso de que nada foi enviado.
 - Testar celular, rolagem e fechamento por teclado.
@@ -62,6 +74,9 @@ Os dados do orçamento ficam temporariamente no diálogo, não no cadastro ou sn
 
 - [Catálogo administrativo](../../src/admin/AdminApp.jsx)
 - [Formulário de produto](../../src/components/Editor.jsx)
+- [Campos de preço](../../src/components/ProductPriceFields.jsx)
+- [Validação e formatação de preço](../../src/utils/productPricing.js)
+- [Estilos dos campos de preço](../../src/styles/priceFields.css)
 - [Cartões e filtros](../../src/pages/Products.jsx)
 - [Prévia administrativa de catálogo e detalhes](../../src/admin/LivePreview.jsx)
 - [Conteúdo compartilhado dos detalhes](../../src/components/ProductDetails.jsx)
