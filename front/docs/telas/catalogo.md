@@ -28,7 +28,7 @@ O orçamento apenas prepara uma mensagem para copiar. WhatsApp aparece somente c
 
 ## Modelo de dados / fluxo
 
-Produto contém `id`, `icon`, `category`, `title`, `description`, `note`, `price`, `features` e `enabled`. O limite é de 30 produtos e oito itens em `features` por produto. Alterações só persistem quando a página é salva; excluir um produto pede confirmação. Não há exclusão de marcas ou páginas nesta entrega.
+Produto contém `id`, `icon`, `category`, `title`, `description`, `note`, `price`, `features` e `enabled`. O limite é de 30 produtos e oito itens em `features` por produto. Alterações só persistem quando a página é salva; excluir um produto pede confirmação. Não há exclusão individual de marcas ou páginas; a limpeza completa dos cadastros locais é uma ação separada em Como funciona, com confirmação e recuperação.
 
 `ProductEditor` aceita `previewPage` e mostra o produto em edição com o tema da página. A apresentação acompanha título, descrição, categoria, ícone, valor, complemento e itens, mesmo antes de salvar e antes de haver título. O identificador do novo item fica estável durante a edição. Salvar produto valida o título e aplica o item ao rascunho; somente Salvar página grava o catálogo no navegador.
 

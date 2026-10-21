@@ -14,7 +14,7 @@ O formulário possui Identidade, Aparência, Links e Produtos. É possível vinc
 
 A barra do estúdio mantém Ver prévia e Salvar página à mão durante a edição. A prévia lateral navega entre Página, catálogo e detalhes; Ver prévia amplia esse conteúdo em um diálogo com opções Celular e Computador. Não é preciso salvar ou completar a identidade para visualizar o rascunho. Gerar link é uma ação separada para criar um snapshot de demonstração.
 
-Na primeira abertura existe somente a marca LocyTech e uma página modelo vinculada. Não representam cliente contratado ou leitura do primeiro site. Novas páginas começam sem conteúdo de cliente. Não há exclusão de marcas ou cadastros de páginas nesta entrega. “Ver projeto de links” é somente um link externo para o primeiro projeto.
+Na primeira abertura o painel está vazio, sem marcas ou páginas de demonstração cadastradas. O modelo público LocyTech continua disponível em `/preview`, sem virar cadastro administrativo. Novas páginas começam sem conteúdo de cliente. Não há exclusão individual de marcas ou páginas; Como funciona oferece uma limpeza completa dos cadastros locais com confirmação e recuperação. “Ver projeto de links” é somente um link externo para o primeiro projeto.
 
 ## Arquivos fonte de verdade
 
@@ -37,6 +37,10 @@ O limite é de 50 páginas e 50 marcas neste navegador. Identidade, identificado
 
 A leitura legada de `locyview-admin:v1` ocorre somente se a chave versão 2 não existir. Ela preserva os cadastros como páginas sem vínculo central, sem associar uma marca automaticamente ou trocar sua identidade. A migração é local e não modifica a chave antiga, nem mesmo ao salvar a versão 2. Uma lista vazia persistida permanece vazia. Conteúdo inválido ou bloqueio ao ler o armazenamento interrompe as gravações da sessão, evitando substituir dados existentes.
 
+Como funciona → Limpar cadastros de teste abre uma confirmação. A ação abrange todas as marcas e páginas do navegador atual, sem decidir pelo nome quais seriam testes. O sistema protege uma cópia local antes de persistir `{ version: 2, records: [], brands: [] }`; se a cópia ou a gravação falhar, não apresenta falso sucesso. A chave vazia evita recuperar automaticamente dados legados. A cópia permite restaurar os cadastros somente enquanto o painel estiver vazio; novos cadastros não são substituídos pela restauração. A limpeza não apaga funções, modelos, código, links de demonstração antigos, dados de outros aparelhos ou o primeiro projeto. Uma nova publicação não limpa dados existentes por conta própria.
+
+Cada edição conserva o `storageToken` lido ao carregar o conjunto. Se outra aba salvar, limpar ou restaurar os cadastros, o evento de armazenamento informa a mudança e oferece Atualizar cadastros. Se houver edição pendente, a atualização pede confirmação antes de descartá-la. Uma gravação com token antigo é bloqueada, preservando tanto os dados mais recentes quanto o rascunho aberto, sem sincronização automática.
+
 A logo aceita PNG, JPEG ou WebP de até 1,5 MB e passa por `optimizeLogo`. As cores podem ser editadas por seletor ou HEX (#RGB ou #RRGGBB); seletor e HEX de seis dígitos aplicam imediatamente. HEX curto é expandido ao sair ou confirmar com Enter. Entrada inválida mostra erro e mantém a última cor válida. O catálogo permite até 30 produtos e oito itens de descrição em cada produto, além de edição, ordenação, ocultação e remoção confirmada. Operações do catálogo só persistem ao salvar a página.
 
 Na etapa Produtos, Ver catálogo abre a prévia diretamente no catálogo e Ver produto abre os detalhes do item escolhido. O formulário de produto oferece sua própria apresentação em tempo real antes de aplicar os dados ao rascunho da página. No celular, Dados do produto e Ver produto alternam a área exibida; quando há largura suficiente, formulário e apresentação ficam lado a lado.
@@ -55,6 +59,8 @@ As prévias são somente leitura quanto aos cadastros: permitem navegar, filtrar
 - Não anunciar login, API, servidor, sincronização ou publicação de páginas inexistentes.
 - Atualizar somente os campos de identidade herdados; respeitar `identityOverrides` e preservar conteúdo e visual da página.
 - Persistir marcas e páginas atomicamente e preservar conteúdo diante de erro.
+- Limpar somente após confirmação e proteção de uma cópia local; restaurar somente com o painel vazio.
+- Bloquear gravação desatualizada e não executar limpeza automática ao atualizar o sistema.
 - Não transformar `/admin` em promessa de proteção de acesso.
 - Não enviar cadastros ao primeiro site nem solicitar senhas ou tokens.
 - Não incluir dados administrativos ou de orçamento nos snapshots.
@@ -71,6 +77,8 @@ As prévias são somente leitura quanto aos cadastros: permitem navegar, filtrar
 - Abrir a prévia sem identidade completa, testar catálogo e detalhes, alternar celular/computador e fechar sem perder alterações.
 - Conferir filtros durante edição ao vivo, item oculto/removido e detalhes do produto ainda não salvo.
 - Conferir migração da versão 1 sem vínculo automático e listas vazias persistidas.
+- Conferir primeiro acesso vazio, confirmação/cancelamento de limpeza, recuperação, bloqueio de restauração após novos cadastros e recarregamento sem retorno de dados legados.
+- Abrir duas abas e conferir aviso de mudança e bloqueio de gravação de um rascunho desatualizado após salvar, limpar ou restaurar na outra.
 - Testar armazenamento inválido, bloqueado ou cheio, sem gravação parcial.
 - Abrir `/preview#p=` e conferir ausência de campos administrativos e edição.
 - Confirmar que alterações locais não mudam snapshots antigos nem o primeiro projeto.
@@ -90,3 +98,4 @@ As prévias são somente leitura quanto aos cadastros: permitem navegar, filtrar
 - [Esquema e snapshot](../../src/utils/pageState.js)
 - [Estilos do painel](../../src/styles/admin.css)
 - [Seleção da aplicação](../../src/index.jsx)
+- [Regressões automatizadas](../../tests/regression.mjs)

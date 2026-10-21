@@ -6,9 +6,11 @@ A entrega contém somente front-end: não há servidor, API, login, autenticaç�
 
 ## Executar
 
-Em `front/`, execute `npm install` na preparação inicial e `npm run dev` para abrir `http://127.0.0.1:4174/`.
+Com Node.js compatível com Vite (18, 20 ou 22 e superiores), em `front/`, execute `npm ci` na preparação inicial e `npm run dev` para abrir `http://127.0.0.1:4174/`. Pela raiz, a instalação equivalente é `npm --prefix front ci`.
 
 `npm run build` gera `../build/`, na raiz do projeto. `npm run preview` serve a construção na porta 4174. Não edite build, dependências ou arquivos de trava manualmente.
+
+Na raiz do projeto, `npm test` executa `front/tests/regression.mjs`, uma suíte local que não acessa o armazenamento do navegador do usuário ou serviços externos.
 
 ## Rotas e funcionalidades
 
@@ -26,12 +28,17 @@ Em `front/`, execute `npm install` na preparação inicial e `npm run dev` para 
 - Prévia interativa de página, catálogo e detalhes, lateral ou ampliada nas larguras Celular e Computador, antes de salvar ou completar os campos obrigatórios.
 - Ver catálogo/Ver produto abrem o resultado diretamente; o formulário de produto também acompanha a digitação com seus detalhes reais.
 - Interface responsiva por largura disponível, com teclado e controles acessíveis.
+- Painel inicialmente vazio, limpeza explícita com confirmação e recuperação local, além de bloqueio de gravações de abas desatualizadas.
 
 ## Dados e limitações
 
-O conjunto `locyview-admin:v2` guarda marcas e páginas atomicamente no navegador da origem atual. Limites: 50 marcas e 50 páginas. O primeiro acesso contém somente marca LocyTech e sua página modelo. Novos cadastros não inventam conteúdo ou clientes. Não há exclusão de marcas ou páginas nesta entrega.
+O conjunto `locyview-admin:v2` guarda marcas e páginas atomicamente no navegador da origem atual. Limites: 50 marcas e 50 páginas. Sem estado salvo, o painel começa sem marcas ou páginas; o modelo público LocyTech não é cadastrado automaticamente. Novos cadastros não inventam conteúdo ou clientes. Não há exclusão individual de marcas ou páginas.
 
 A leitura legada versão 1 preserva identidades de páginas sem vinculá-las automaticamente a marcas. Dados versão 2 sem `identityOverrides` recebem lista vazia, e páginas sem `design` recebem o visual padrão, sem apagar cadastros ou mudar chaves. Uma lista vazia salva permanece vazia. Dados inválidos e armazenamento bloqueado impedem substituição; quota ou falha ao gravar mantém a edição aberta.
+
+Como funciona → Limpar cadastros de teste solicita confirmação para remover todas as marcas, páginas e seus produtos deste navegador. Antes de gravar a versão 2 vazia, guarda uma cópia em `locyview-admin:recovery:v1`. Falha na proteção ou gravação impede anunciar sucesso. Restaurar cadastros anteriores só é permitido no painel vazio; não substitui novos cadastros. Nova limpeza de dados não vazios substitui a cópia anterior, mas um estado já vazio mantém a recuperação disponível. O legado permanece guardado sem reaparecer pelo fallback. Publicar ou atualizar o aplicativo nunca executa a limpeza automaticamente.
+
+Salvar, limpar e restaurar usam o `storageToken` da leitura para detectar mudanças feitas em outra aba. Uma gravação desatualizada é bloqueada. O aviso oferece Atualizar cadastros e pede confirmação para descartar alterações pendentes, sem sincronização silenciosa. Dados do navegador e recuperação não são enviados ao GitHub, servidor, primeiro projeto ou outros aparelhos; snapshots antigos não são apagados pela limpeza.
 
 A prévia administrativa acompanha o rascunho atual, permite navegar e filtrar e não grava dados. Contatos externos são apenas inspecionados por aviso; não há envio ou orçamento nessa superfície. No editor de produto, Salvar produto aplica o item ao rascunho da página, mas a gravação local ainda depende de Salvar página.
 
@@ -43,7 +50,7 @@ Aplicar modelo preserva conteúdo, paleta e a prioridade dos canais. A prévia a
 
 A demonstração usa quatro atalhos e catálogo aberto por clique. Os preços do modelo LocyTech são ilustrativos, em R$ 0,00, sem oferecer serviço gratuito. O orçamento apenas prepara texto, sem envio automático.
 
-A hospedagem deste sistema é `https://locyview-painel.locytech.chatgpt.site`. “Ver projeto de links” abre o primeiro site externamente, sem integração. Não há novo destino GitHub configurado; o repositório anteriormente fornecido pertence ao primeiro projeto.
+A hospedagem deste sistema é `https://locyview-painel.locytech.chatgpt.site`. “Ver projeto de links” abre o primeiro site externamente, sem integração. O destino GitHub autorizado do painel é [sistema-do-locyview](https://github.com/gustavopaulus2230-eng/sistema-do-locyview); o repositório anteriormente fornecido pertence ao primeiro projeto e permanece separado.
 
 ## Documentação
 
@@ -78,3 +85,4 @@ A hospedagem deste sistema é `https://locyview-painel.locytech.chatgpt.site`. �
 - [Estilos do painel](src/styles/admin.css)
 - [Estilos do modelo](src/styles/global.css)
 - [Dependências e comandos](package.json)
+- [Regressões automatizadas](tests/regression.mjs)

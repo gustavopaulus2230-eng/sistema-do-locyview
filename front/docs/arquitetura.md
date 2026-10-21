@@ -38,7 +38,11 @@ O conjunto administrativo versão 2 contém `{ version: 2, records, brands }` em
 
 Salvar uma marca propaga exclusivamente nome, logo, cor principal, destaque e fundo ainda herdados pelas páginas locais vinculadas. Campos alterados na própria página entram em `identityOverrides`, que aceita apenas essas cinco chaves e impede sua substituição. Usar identidade da marca limpa exceções e reaplica a identidade; trocar de marca também limpa exceções. Textos, identificador, assinatura, canais, produtos e visual permanecem específicos. Marcas e páginas são gravadas em uma única operação para preservar consistência. As alterações em memória só são apresentadas como salvas após sucesso.
 
-A leitura legada de `locyview-admin:v1` ocorre somente quando a chave versão 2 não existe e mantém páginas sem vínculo automático, preservando suas identidades. O armazenamento legado não é apagado, inclusive após salvar a versão nova. Se não existe estado salvo, surge somente marca LocyTech e página modelo vinculada; conjuntos vazios persistidos continuam vazios. Dados inválidos, leitura bloqueada ou falha de quota são informados e não justificam sobrescrever conteúdo anterior.
+A leitura legada de `locyview-admin:v1` ocorre somente quando a chave versão 2 não existe e mantém páginas sem vínculo automático, preservando suas identidades. O armazenamento legado não é apagado, inclusive após salvar a versão nova. Sem estado salvo, o painel começa sem marcas ou páginas; o modelo público LocyTech não é inserido como cadastro. Conjuntos vazios persistidos continuam vazios. Dados inválidos, leitura bloqueada ou falha de quota são informados e não justificam sobrescrever conteúdo anterior.
+
+Como funciona oferece Limpar cadastros de teste, uma ação explícita com confirmação que limpa todas as marcas e páginas deste navegador, não somente registros identificados por nome. Antes da limpeza é preservada uma cópia local em `locyview-admin:recovery:v1`; se não for possível proteger os dados ou gravar o conjunto vazio versão 2, a interface não anuncia sucesso. A cópia só pode ser restaurada enquanto o painel estiver vazio, sem substituir cadastros novos. Uma nova limpeza de dados não vazios substitui a cópia anterior; um estado já vazio não apaga a recuperação existente. Manter a chave versão 2 vazia impede que o fallback legado faça reaparecer dados antigos. Atualizar ou publicar o aplicativo nunca executa a limpeza automaticamente. A ação não muda código, modelos, snapshots existentes, outros navegadores ou o primeiro site.
+
+O carregamento fornece um `storageToken`, usado para detectar alterações desde a leitura. O painel fornece o token a `persistClientRecords`, `resetClientRecords` e `restoreClientRecords`; gravar com um token desatualizado é bloqueado para não restaurar dados removidos ou sobrescrever alterações de outra aba. O evento de armazenamento avisa da mudança e oferece Atualizar cadastros, respeitando a confirmação de descarte de rascunho. Não sincroniza nem grava automaticamente a edição aberta.
 
 O esquema público versão 3 contém marca, textos, identificador, logo, três cores, assinatura, produtos, três links e `design`. O painel normaliza com `migrateDefaults: false`; snapshots incluem `preserveConfiguredValues: true`. Assim, valores personalizados não sofrem migrações antigas do modelo LocyTech.
 
@@ -68,7 +72,7 @@ Os seletores de cor aplicam imediatamente, assim como HEX de seis dígitos. HEX 
 
 Assets são locais; `/assets/locytech-hd.png` funciona em todas as rotas. Vite gera `build/` na raiz, conforme `.openai/hosting.json`, que mantém a identidade independente deste painel. A porta local é 4174, distinta da 4173 do primeiro projeto. Dependências, build e arquivos de trava são gerados automaticamente e não devem ser editados à mão.
 
-Não há destino GitHub novo configurado nesta entrega. O repositório LocyView fornecido anteriormente pertence ao primeiro projeto; não usá-lo para publicar este painel sem autorização específica.
+O destino GitHub autorizado para este painel é [sistema-do-locyview](https://github.com/gustavopaulus2230-eng/sistema-do-locyview). O repositório LocyView fornecido anteriormente pertence ao primeiro projeto; não usá-lo para publicar este painel. Cadastros locais e cópias de recuperação do navegador não fazem parte dos arquivos versionados.
 
 ## Regras críticas
 
@@ -79,7 +83,9 @@ Não há destino GitHub novo configurado nesta entrega. O repositório LocyView 
 - Manter 24 modelos distintos, sem sobrescrever cores ou conteúdo; renderizar ajustes de forma equivalente na prévia e no snapshot.
 - Preservar a ordem dos canais ao aplicar modelo e reutilizar catálogo/detalhes nas prévias, sem bloquear sua navegação.
 - Permitir conferir o rascunho antes da validação para salvar; bloquear contatos externos e qualquer gravação na superfície de prévia administrativa.
-- Preservar migração sem vínculo automático e estados vazios.
+- Preservar migração sem vínculo automático, primeiro acesso vazio e estados vazios persistidos.
+- Limpar cadastros somente por ação explícita, confirmação e cópia local de recuperação; restaurar somente em painel vazio.
+- Bloquear gravações de abas desatualizadas e nunca limpar dados automaticamente em uma publicação.
 - Manter preços textuais e o ajuste rápido no formulário compartilhado; aplicar somente valores válidos ao rascunho e persistir somente ao salvar a página.
 - Não compartilhar dados administrativos, orçamento ou segredos.
 - Manter armazenamento local explícito e avisos de falha honestos.
@@ -94,10 +100,12 @@ Não há destino GitHub novo configurado nesta entrega. O repositório LocyView 
 - Conferir três abas de design, barra de ações, prévia lateral/ampliada, filtro preservado e detalhes de item alterado, oculto ou removido.
 - Conferir produto durante a digitação e fechamento da prévia sem perder o rascunho da página.
 - Conferir ajuste rápido e edição completa de preço, quatro modos, zero, condições existentes, validação, cancelamento, salvamento local e snapshot.
-- Conferir limites, validação, versão 1, listas vazias e falhas de armazenamento.
+- Conferir limites, validação, versão 1, primeiro acesso vazio, listas vazias e falhas de armazenamento.
+- Conferir limpeza cancelada e confirmada, cópia de recuperação, restauração somente em estado vazio, falhas de gravação e bloqueio de aba desatualizada.
 - Abrir as rotas diretamente e recarregar; testar snapshot sem campos administrativos.
 - Conferir celular, computador, teclado e diálogos.
 - Executar `npm run build` e verificar identidade própria de publicação.
+- Executar `npm test` na raiz para a suíte de regressão local, sem acesso a servidor ou dados do navegador do usuário.
 - Atualizar domínios antes de AGENTS e READMEs.
 
 ## Código relacionado
@@ -123,4 +131,5 @@ Não há destino GitHub novo configurado nesta entrega. O repositório LocyView 
 - [Estilos do painel](../src/styles/admin.css)
 - [Estilos do modelo](../src/styles/global.css)
 - [Comandos](../../package.json)
+- [Regressões automatizadas](../tests/regression.mjs)
 - [Publicação independente](../../.openai/hosting.json)

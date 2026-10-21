@@ -8,7 +8,7 @@ O primeiro projeto é a página de links LocyTech, mantida em `locytech-bio`, co
 
 O painel possui sua própria identidade de hospedagem: [LocyView — Painel](https://locyview-painel.locytech.chatgpt.site/). O item “Ver projeto de links” abre o primeiro site por um link externo comum; não existe integração automática entre os projetos.
 
-Não há novo destino GitHub configurado para este painel. O repositório fornecido anteriormente não deve ser reutilizado para substituir o primeiro projeto.
+O repositório destinado a este painel é [sistema-do-locyview](https://github.com/gustavopaulus2230-eng/sistema-do-locyview). O repositório do primeiro projeto permanece separado. Cadastros e cópias de recuperação armazenados no navegador não fazem parte do código enviado ao GitHub.
 
 ## Funcionalidades
 
@@ -25,22 +25,29 @@ Não há novo destino GitHub configurado para este painel. O repositório fornec
 - Ver catálogo e Ver produto diretos, além de detalhes do produto acompanhando a digitação no formulário.
 - Barra de ações para visualizar/salvar e geração separada de link de demonstração com uma versão fixa da página.
 - Salvamento manual no navegador, com validação e avisos de falha.
+- Primeiro acesso sem cadastros de demonstração, limpeza explícita com confirmação e cópia local de recuperação.
+- Proteção contra gravação de abas desatualizadas após alterações de dados em outra aba.
 
 O endereço principal `/` abre o painel; `/admin` é alias. `/preview#p=` abre somente o modelo de demonstração, mantido neste projeto. Não é uma rota do primeiro site nem publicação centralizada de cliente.
 
 ## Executar
 
-Instale as dependências em `front/` com `npm install`. Na raiz deste projeto:
+Com Node.js compatível com Vite (18, 20 ou 22 e superiores), instale as dependências pela raiz com `npm --prefix front ci`. Na raiz deste projeto:
 
 - `npm run dev`: prévia de desenvolvimento em `http://127.0.0.1:4174/`.
 - `npm run build`: gera `build/` na raiz.
 - `npm run preview`: serve a construção na porta 4174.
+- `npm test`: executa as regressões locais, sem acessar cadastros do navegador ou servidor.
 
 ## Armazenamento e limites
 
-A versão administrativa `locyview-admin:v2` guarda marcas e páginas juntas, atomicamente. Há limite de 50 marcas e 50 páginas neste navegador. O primeiro acesso possui somente marca LocyTech e página modelo vinculada, sem inventar clientes, vendas ou acessos.
+A versão administrativa `locyview-admin:v2` guarda marcas e páginas juntas, atomicamente. Há limite de 50 marcas e 50 páginas neste navegador. Sem estado salvo, o painel começa vazio. O modelo público de demonstração LocyTech não cria cadastros administrativos nem inventa clientes, vendas ou acessos.
 
 Registros legados versão 1 continuam com suas identidades e sem vínculo automático. Dados vazios salvos continuam vazios. Conteúdo inválido ou armazenamento bloqueado não é substituído; erro ao salvar não apresenta sucesso parcial.
+
+Para zerar os cadastros locais, abra Como funciona → Limpar cadastros de teste e confirme. A limpeza remove todas as páginas, seus produtos e marcas deste navegador, mantendo o sistema e seus modelos. Uma cópia local protegida antes da limpeza permite Restaurar cadastros anteriores enquanto o painel estiver vazio. Cadastrar novos dados bloqueia a restauração para não sobrescrevê-los; uma nova limpeza com dados substitui a cópia anterior. A versão 2 vazia impede retorno automático de registros legados. Publicar ou atualizar o sistema não apaga dados existentes automaticamente.
+
+Se outra aba alterar os cadastros, o painel avisa e bloqueia uma gravação desatualizada. Use Atualizar cadastros para carregar os dados atuais; edições pendentes exigem confirmação antes do descarte. Não há sincronização automática.
 
 Editar uma marca atualiza somente nome, logo e cores ainda herdados pelas páginas locais vinculadas. Campos personalizados são protegidos por `identityOverrides`. Não altera o primeiro site, outros aparelhos ou links de prévia antigos. Textos, identificadores, links, produtos, visual e dados administrativos de cada página são preservados. Aplicar modelo altera somente os ajustes de `design`, sem resetar nome, logo, paleta ou a prioridade dos canais. Dados antigos recebem padrões compatíveis, sem apagar cadastros.
 
@@ -50,7 +57,7 @@ Ajustar preço abre o mesmo formulário focado somente no valor. Aplicar preço 
 
 O link de demonstração contém dados públicos da versão gerada. Inclui o visual escolhido, mas não nome administrativo, datas, vínculo interno, `identityOverrides` ou orçamento. Não atualiza sozinho, não cria endereço curto e não permite revogação. Não use o painel para informações sigilosas.
 
-A rota administrativa não é uma proteção por login. Não há exclusão de marcas ou páginas nesta entrega, envio de mensagens, cadastro centralizado ou integração com servidor.
+A rota administrativa não é uma proteção por login. Não há exclusão individual de marcas ou páginas, envio de mensagens, cadastro centralizado ou integração com servidor. A limpeza completa é uma ação local explícita; ela não apaga snapshots antigos, dados de outros aparelhos ou o primeiro projeto. A cópia de recuperação também fica somente neste navegador.
 
 ## Documentação
 
@@ -81,4 +88,5 @@ A rota administrativa não é uma proteção por login. Não há exclusão de ma
 - [Campos de configuração](front/src/components/PageFields.jsx)
 - [Modelo de prévia](front/src/App.jsx)
 - [Comandos](package.json)
+- [Regressões automatizadas](front/tests/regression.mjs)
 - [Publicação independente](.openai/hosting.json)

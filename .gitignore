@@ -4,5 +4,11 @@ front/build/
 build/
 .sites-runtime/
 *.log
-.env
-.env.local
+.env*
+!.env.example
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.tmp
+*.bak

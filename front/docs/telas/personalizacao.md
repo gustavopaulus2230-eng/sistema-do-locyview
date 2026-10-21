@@ -37,7 +37,7 @@ A logo aceita PNG, JPEG e WebP de até 1,5 MB. `optimizeLogo` limita uploads a 4
 
 `publicSnapshot` inclui somente configuração pública, produtos habilitados e URLs validadas. UTF-8 é preservado. `decodeSnapshot` valida antes de normalizar. Links inválidos não carregam cadastros administrativos ou rascunhos locais.
 
-O painel usa `migrateDefaults: false`; novos snapshots incluem `preserveConfiguredValues: true`. Preços, textos, cores e links de clientes não são substituídos por migrações de padrões LocyTech. Os contatos predefinidos pertencem apenas ao modelo inicial; páginas novas começam com destinos vazios.
+O painel usa `migrateDefaults: false`; novos snapshots incluem `preserveConfiguredValues: true`. Preços, textos, cores e links de clientes não são substituídos por migrações de padrões LocyTech. Os contatos predefinidos pertencem apenas ao modelo público de demonstração, não a cadastros automáticos; o primeiro acesso administrativo está vazio e páginas novas começam com destinos vazios.
 
 ## Regras críticas
 

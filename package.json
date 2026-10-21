@@ -4,6 +4,7 @@
   "private": true,
   "description": "Painel front-end independente LocyView para configurar páginas de clientes",
   "scripts": {
+    "test": "node front/tests/regression.mjs",
     "dev": "node front/node_modules/vite/bin/vite.js front --host 127.0.0.1 --port 4174 --strictPort",
     "build": "node front/node_modules/vite/bin/vite.js build front --outDir ../build --emptyOutDir",
     "preview": "node front/node_modules/vite/bin/vite.js preview front --outDir ../build --host 127.0.0.1 --port 4174 --strictPort"

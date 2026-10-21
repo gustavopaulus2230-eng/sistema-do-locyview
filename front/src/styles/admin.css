@@ -654,3 +654,9 @@
   .lv-admin .lv-appearance-colors .color-option input[type='color'] { width: 48px; height: 98px; }
   .lv-admin .lv-form-footer { padding-left: 15px; padding-right: 15px; }
 }
+.lv-admin .lv-refresh-data { margin: 0 0 20px; }
+.lv-admin .lv-data-maintenance { margin-top: 26px; padding-top: 24px; border-top: 1px solid #314969; }
+.lv-admin .lv-data-maintenance h3 { margin: 0 0 10px; color: #e5efff; font-size: 18px; }
+.lv-admin .lv-data-maintenance p { color: #a8bddb; font-size: 13px; line-height: 1.8; overflow-wrap: anywhere; }
+.lv-admin .lv-data-maintenance .lv-btn { max-width: 100%; min-height: 44px; white-space: normal; }
+.lv-admin .lv-data-maintenance .lv-recovery-note { margin-top: 24px; }

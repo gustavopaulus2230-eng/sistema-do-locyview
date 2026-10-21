@@ -6,11 +6,11 @@ Centralizar nome, logo e cores de uma marca para reutilizá-los nas páginas loc
 
 ## Visão geral
 
-Marcas fica logo abaixo de Páginas dos clientes no menu. A tela permite cadastrar e editar a identidade da marca e consultar seu uso nas páginas locais. Não há exclusão nesta entrega.
+Marcas fica logo abaixo de Páginas dos clientes no menu. A tela permite cadastrar e editar a identidade da marca e consultar seu uso nas páginas locais. Não há exclusão individual; a limpeza completa de marcas e páginas fica em Como funciona, com confirmação e cópia local de recuperação.
 
 O formulário concentra nome, logo e três cores: principal, destaque e fundo. Textos, identificador de página, links, assinatura e produtos não pertencem ao cadastro central da marca.
 
-A marca inicial LocyTech e sua página modelo aparecem somente quando não existe estado salvo. Não são registros importados do primeiro site nem métricas de clientes reais.
+Sem estado salvo, não há marcas ou páginas cadastradas. O modelo público LocyTech não é inserido na lista administrativa e não representa importação do primeiro site ou cliente contratado.
 
 ## Arquivos fonte de verdade
 
@@ -32,6 +32,8 @@ Há limite de 50 marcas e 50 páginas por navegador. O nome da marca é obrigat�
 
 Dados legados versão 1 são mantidos como páginas sem vínculo automático. Não associar uma marca por semelhança de nome nem substituir identidade personalizada. O conjunto antigo só passa ao novo armazenamento quando o usuário salva com sucesso. Estado vazio salvo continua vazio.
 
+A limpeza explícita esvazia marcas e páginas juntas e mantém a versão 2 vazia para impedir retorno automático do legado. Uma cópia local de recuperação só pode ser restaurada enquanto não houver novos cadastros. A gravação usa o `storageToken` da leitura para impedir que uma aba antiga reponha dados já removidos ou sobrescreva uma marca atualizada em outra aba. Publicar uma atualização não limpa o navegador automaticamente.
+
 Uma prévia gerada contém uma cópia da identidade resolvida naquele momento. Editar a marca não atualiza links de demonstração antigos, o primeiro site ou outros aparelhos. Nenhum cadastro é enviado a servidor.
 
 ## Regras críticas
@@ -40,6 +42,7 @@ Uma prévia gerada contém uma cópia da identidade resolvida naquele momento. E
 - Preservar conteúdo específico, identificadores internos e vínculos válidos.
 - Gravar marcas e páginas juntas, sem sucesso parcial.
 - Não apagar ou sobrescrever armazenamento inválido ou bloqueado.
+- Não limpar automaticamente; manter confirmação, recuperação em painel vazio e proteção contra gravação de aba antiga.
 - Não inventar importação, autenticação, publicação ou sincronização.
 - Não incluir `brandId`, `identityOverrides` nem outros dados administrativos nos snapshots.
 

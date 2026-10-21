@@ -3,11 +3,13 @@ import { normalizeDesign } from './pageDesign';
 
 export const ADMIN_STORAGE_KEY = 'locyview-admin:v2';
 export const LEGACY_ADMIN_STORAGE_KEY = 'locyview-admin:v1';
+export const CLIENT_RECOVERY_STORAGE_KEY = 'locyview-admin:recovery:v1';
 const MAX_CLIENTS = 50;
 const MAX_BRANDS = 50;
 const brandFields = ['name', 'logo', 'primaryColor', 'accentColor', 'backgroundColor'];
 const colorFields = ['primaryColor', 'accentColor', 'backgroundColor'];
 const invalidStorageMessage = 'Os cadastros salvos neste navegador são inválidos. Nenhum dado foi substituído.';
+const staleStorageMessage = 'Os cadastros foram alterados em outra aba. Recarregue os dados antes de continuar. Nenhum cadastro foi substituído.';
 const limitMessage = 'O limite de 50 páginas deste navegador foi atingido. Edite um cadastro existente.';
 const brandLimitMessage = 'O limite de 50 marcas deste navegador foi atingido. Edite uma marca existente.';
 const isObject = value => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -173,52 +175,107 @@ function canonicalRecord(record, brands) {
   return { id: configured.id, clientName: configured.clientName, brandId: configured.brandId, identityOverrides: configured.identityOverrides, page: { ...clone(configured.page), design: normalizeDesign(configured.page.design) }, updatedAt: configured.updatedAt };
 }
 
-function initialRecords() {
-  const brand = { id: 'locytech-brand', ...Object.fromEntries(brandFields.map(field => [field, defaults[field]])), updatedAt: null };
-  return {
-    records: [{ id: 'locytech-example', clientName: 'LocyTech', brandId: brand.id, identityOverrides: [], page: clone(defaults), updatedAt: null }],
-    brands: [brand], error: ''
-  };
+const storageTokenFor = (key, value) => JSON.stringify([key, value]);
+
+function parseStoredRecords(parsed, legacy = false) {
+  if (!isObject(parsed) || parsed.version !== (legacy ? 1 : 2)) return null;
+  const brands = legacy ? [] : parsed.brands;
+  const records = legacy && Array.isArray(parsed.records) ? parsed.records.map(record => isObject(record) ? { ...record, brandId: '' } : record) : parsed.records;
+  if (!brandsAreValid(brands) || !recordsAreValid(records, brands)) return null;
+  return { records: records.map(record => canonicalRecord(record, brands)), brands: brands.map(brand => ({ ...brand })) };
+}
+
+function storageWriteError(error) {
+  const quotaExceeded = error?.name === 'QuotaExceededError' || error?.name === 'NS_ERROR_DOM_QUOTA_REACHED';
+  return quotaExceeded ? 'O armazenamento deste navegador está cheio. Reduza as logos antes de tentar novamente.' : 'Não foi possível salvar neste navegador. Verifique se o armazenamento local está permitido e tente novamente.';
+}
+
+function currentStorageIssue(current, expectedToken) {
+  if (current.error) return { ok: false, error: current.error };
+  if (expectedToken !== undefined && expectedToken !== current.storageToken) return { ok: false, error: staleStorageMessage, conflict: true };
+  return null;
 }
 
 export function loadClientRecords() {
   let saved;
+  let key = ADMIN_STORAGE_KEY;
   let legacy = false;
   try {
     saved = globalThis.localStorage.getItem(ADMIN_STORAGE_KEY);
-    if (saved === null) { saved = globalThis.localStorage.getItem(LEGACY_ADMIN_STORAGE_KEY); legacy = true; }
-  } catch { return { records: [], brands: [], error: 'O armazenamento deste navegador está bloqueado. Não foi possível carregar os cadastros locais.' }; }
-  if (saved === null) return initialRecords();
+    if (saved === null) { key = LEGACY_ADMIN_STORAGE_KEY; saved = globalThis.localStorage.getItem(key); legacy = true; }
+  } catch { return { records: [], brands: [], storageToken: null, error: 'O armazenamento deste navegador está bloqueado. Não foi possível carregar os cadastros locais.' }; }
+  const storageToken = storageTokenFor(saved === null ? null : key, saved);
+  if (saved === null) return { records: [], brands: [], storageToken, error: '' };
   try {
-    const parsed = JSON.parse(saved);
-    if (!isObject(parsed) || parsed.version !== (legacy ? 1 : 2)) return { records: [], brands: [], error: invalidStorageMessage };
-    const brands = legacy ? [] : parsed.brands;
-    const records = legacy && Array.isArray(parsed.records) ? parsed.records.map(record => isObject(record) ? { ...record, brandId: '' } : record) : parsed.records;
-    if (!brandsAreValid(brands) || !recordsAreValid(records, brands)) return { records: [], brands: [], error: invalidStorageMessage };
-    return {
-      records: records.map(record => canonicalRecord(record, brands)),
-      brands: brands.map(brand => ({ ...brand })),
-      error: ''
-    };
-  } catch { return { records: [], brands: [], error: invalidStorageMessage }; }
+    const parsed = parseStoredRecords(JSON.parse(saved), legacy);
+    return parsed ? { ...parsed, storageToken, error: '' } : { records: [], brands: [], storageToken, error: invalidStorageMessage };
+  } catch { return { records: [], brands: [], storageToken, error: invalidStorageMessage }; }
 }
 
-export function persistClientRecords(records, brands = []) {
+export function persistClientRecords(records, brands = [], expectedToken) {
   if (Array.isArray(records) && records.length > MAX_CLIENTS) return { ok: false, error: limitMessage };
   if (Array.isArray(brands) && brands.length > MAX_BRANDS) return { ok: false, error: brandLimitMessage };
   if (!brandsAreValid(brands) || !recordsAreValid(records, brands)) return { ok: false, error: 'Revise os dados dos clientes e marcas antes de salvar. Nenhum cadastro foi substituído.' };
   const current = loadClientRecords();
-  if (current.error) return { ok: false, error: current.error };
+  const issue = currentStorageIssue(current, expectedToken);
+  if (issue) return issue;
   try {
     const sanitizedBrands = brands.map(cleanBrand);
     const sanitizedRecords = records.map(record => canonicalRecord(record, sanitizedBrands));
     if (!brandsAreValid(sanitizedBrands) || !recordsAreValid(sanitizedRecords, sanitizedBrands)) return { ok: false, error: 'Revise os dados dos clientes e marcas antes de salvar. Nenhum cadastro foi substituído.' };
-    globalThis.localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify({ version: 2, records: sanitizedRecords, brands: sanitizedBrands }));
-    return { ok: true, error: '' };
+    const serialized = JSON.stringify({ version: 2, records: sanitizedRecords, brands: sanitizedBrands });
+    globalThis.localStorage.setItem(ADMIN_STORAGE_KEY, serialized);
+    return { ok: true, error: '', storageToken: storageTokenFor(ADMIN_STORAGE_KEY, serialized) };
   } catch (error) {
-    const quotaExceeded = error?.name === 'QuotaExceededError' || error?.name === 'NS_ERROR_DOM_QUOTA_REACHED';
-    return { ok: false, error: quotaExceeded ? 'O armazenamento deste navegador está cheio. Reduza as logos antes de tentar novamente.' : 'Não foi possível salvar neste navegador. Verifique se o armazenamento local está permitido e tente novamente.' };
+    return { ok: false, error: storageWriteError(error) };
   }
+}
+
+function readClientRecovery() {
+  const absent = { available: false, recordCount: 0, brandCount: 0, savedAt: null, error: '' };
+  let raw;
+  try { raw = globalThis.localStorage.getItem(CLIENT_RECOVERY_STORAGE_KEY); }
+  catch { return { ...absent, error: 'Não foi possível consultar a cópia de segurança neste navegador.' }; }
+  if (raw === null) return absent;
+  try {
+    const parsed = JSON.parse(raw);
+    const state = parseStoredRecords(isObject(parsed) ? { ...parsed, version: 2 } : null);
+    if (!isObject(parsed) || parsed.version !== 1 || typeof parsed.savedAt !== 'string' || !validDate(parsed.savedAt) || !state) throw new Error('Cópia inválida');
+    return { available: true, recordCount: state.records.length, brandCount: state.brands.length, savedAt: parsed.savedAt, error: '', ...state };
+  } catch { return { ...absent, error: 'A cópia de segurança deste navegador é inválida. Nenhum cadastro foi substituído.' }; }
+}
+
+export function loadClientRecovery() {
+  const { available, recordCount, brandCount, savedAt, error } = readClientRecovery();
+  return { available, recordCount, brandCount, savedAt, error };
+}
+
+export function resetClientRecords(expectedToken) {
+  const current = loadClientRecords();
+  const issue = currentStorageIssue(current, expectedToken);
+  if (issue) return issue;
+  if (current.records.length || current.brands.length) {
+    try {
+      const backup = { version: 1, savedAt: new Date().toISOString(), records: current.records, brands: current.brands };
+      globalThis.localStorage.setItem(CLIENT_RECOVERY_STORAGE_KEY, JSON.stringify(backup));
+    } catch (error) {
+      return { ok: false, error: `Não foi possível guardar a cópia de segurança. Nenhum cadastro foi apagado. ${storageWriteError(error)}` };
+    }
+  }
+  const saved = persistClientRecords([], [], current.storageToken);
+  return saved.ok ? { ...saved, records: [], brands: [] } : saved;
+}
+
+export function restoreClientRecords(expectedToken) {
+  const current = loadClientRecords();
+  const issue = currentStorageIssue(current, expectedToken);
+  if (issue) return issue;
+  if (current.records.length || current.brands.length) return { ok: false, error: 'Restaure a cópia somente com a lista de páginas e marcas vazia. Os cadastros atuais foram preservados.' };
+  const recovery = readClientRecovery();
+  if (recovery.error) return { ok: false, error: recovery.error };
+  if (!recovery.available) return { ok: false, error: 'Não existe uma cópia de segurança disponível neste navegador.' };
+  const saved = persistClientRecords(recovery.records, recovery.brands, current.storageToken);
+  return saved.ok ? { ...saved, records: recovery.records, brands: recovery.brands } : saved;
 }
 
 export function clientPreviewUrl(page, href = window.location.href) {

@@ -7,7 +7,7 @@ import { BrandForm, BrandsList } from './BrandViews';
 import PageDesignFields from './PageDesignFields';
 import LivePreview from './LivePreview';
 import { categoryName, clone, copyText, safeLogo, safeUrl } from '../utils/pageState';
-import { applyBrandToRecord, clientPreviewUrl, createBrandRecord, createClientRecord, loadClientRecords, persistClientRecords, prepareBrandRecord, prepareClientRecord, validateBrandRecord, validateClientRecord } from '../utils/adminState';
+import { ADMIN_STORAGE_KEY, LEGACY_ADMIN_STORAGE_KEY, applyBrandToRecord, clientPreviewUrl, createBrandRecord, createClientRecord, loadClientRecords, loadClientRecovery, persistClientRecords, resetClientRecords, restoreClientRecords, prepareBrandRecord, prepareClientRecord, validateBrandRecord, validateClientRecord } from '../utils/adminState';
 import '../styles/admin.css';
 
 const steps = [
@@ -52,6 +52,9 @@ export default function AdminApp() {
   const [modal, setModal] = useState(null);
   const [message, setMessage] = useState('');
   const [storageError, setStorageError] = useState(loaded.error);
+  const [storageConflict, setStorageConflict] = useState(false);
+  const [recovery, setRecovery] = useState(loadClientRecovery);
+  const storageTokenRef = useRef(loaded.storageToken);
   const timer = useRef(null);
   const shareRef = useRef(null);
   const headingRef = useRef(null);
@@ -67,6 +70,20 @@ export default function AdminApp() {
     else headingRef.current?.focus({ preventScroll: true });
   }, [view]);
   useEffect(() => () => window.clearTimeout(timer.current), []);
+  useEffect(() => {
+    const changed = event => {
+      if (event.storageArea !== window.localStorage) return;
+      setRecovery(loadClientRecovery());
+      if (event.key !== null && event.key !== ADMIN_STORAGE_KEY && event.key !== LEGACY_ADMIN_STORAGE_KEY) return;
+      const current = loadClientRecords();
+      if (current.error || current.storageToken !== storageTokenRef.current) {
+        setStorageConflict(true);
+        setStorageError(current.error || 'Os cadastros mudaram em outra aba. Atualize os dados antes de salvar para não sobrescrever alterações.');
+      }
+    };
+    window.addEventListener('storage', changed);
+    return () => window.removeEventListener('storage', changed);
+  }, []);
   useEffect(() => {
     const guard = event => { if (dirty) { event.preventDefault(); event.returnValue = ''; } };
     window.addEventListener('beforeunload', guard);
@@ -85,6 +102,47 @@ export default function AdminApp() {
   function navigate(action) {
     if (dirty) { setModal({ type: 'discard', action }); return; }
     action();
+  }
+
+  function applyStoredState(result) {
+    storageTokenRef.current = result.storageToken;
+    setRecords(result.records);
+    setBrands(result.brands);
+    setDraft(null);
+    setBrandDraft(null);
+    setDirty(false);
+    setValidation(null);
+    setSearch('');
+    setFilter('all');
+    setView('clients');
+    setStorageError('');
+    setStorageConflict(false);
+    setRecovery(loadClientRecovery());
+    setModal(null);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  function refreshStoredState() {
+    navigate(() => {
+      const current = loadClientRecords();
+      if (current.error) { setStorageError(current.error); return; }
+      applyStoredState(current);
+      toast('Cadastros atualizados com os dados deste navegador.');
+    });
+  }
+
+  function cleanTestRecords() {
+    const result = resetClientRecords(storageTokenRef.current);
+    if (!result.ok) { setStorageError(result.error); toast(result.error); return; }
+    applyStoredState(result);
+    toast('Cadastros de teste removidos. A cópia de recuperação está em Como funciona.');
+  }
+
+  function recoverTestRecords() {
+    const result = restoreClientRecords(storageTokenRef.current);
+    if (!result.ok) { setStorageError(result.error); toast(result.error); return; }
+    applyStoredState(result);
+    toast('Cadastros anteriores restaurados neste navegador.');
   }
 
   function openRecord(record, brand = null) {
@@ -138,14 +196,15 @@ export default function AdminApp() {
     event.preventDefault();
     const invalidColor = event.currentTarget.querySelector('.color-hex:invalid');
     if (invalidColor) { invalidColor.reportValidity(); invalidColor.focus(); return; }
-    if (loaded.error) { setStorageError(loaded.error); return; }
+    if (storageConflict) { toast('Atualize os cadastros antes de salvar. Seu rascunho foi preservado.'); return; }
     const issue = validateBrandRecord(brandDraft, brands);
     if (issue) { setValidation(issue); return; }
     const brand = prepareBrandRecord(brandDraft);
     const nextBrands = brands.some(item => item.id === brand.id) ? brands.map(item => item.id === brand.id ? brand : item) : [...brands, brand];
     const nextRecords = records.map(record => record.brandId === brand.id ? { ...applyBrandToRecord(record, nextBrands), updatedAt: brand.updatedAt } : record);
-    const result = persistClientRecords(nextRecords, nextBrands);
+    const result = persistClientRecords(nextRecords, nextBrands, storageTokenRef.current);
     if (!result.ok) { setStorageError(result.error); toast(result.error); return; }
+    storageTokenRef.current = result.storageToken;
     setBrands(nextBrands);
     setRecords(nextRecords);
     setBrandDraft(brand);
@@ -178,13 +237,14 @@ export default function AdminApp() {
     event?.preventDefault();
     const invalidColor = event?.currentTarget?.querySelector?.('.color-hex:invalid');
     if (invalidColor) { invalidColor.reportValidity(); invalidColor.focus(); return; }
-    if (loaded.error) { setStorageError(`${loaded.error} Use a prévia sem salvar ou verifique o armazenamento antes de continuar.`); return; }
+    if (storageConflict) { toast('Atualize os cadastros antes de salvar. Seu rascunho foi preservado.'); return; }
     if (!check(draft)) return;
     const record = prepareClientRecord(draft, brands);
     const exists = records.some(item => item.id === record.id);
     const next = exists ? records.map(item => item.id === record.id ? record : item) : [...records, record];
-    const result = persistClientRecords(next, brands);
+    const result = persistClientRecords(next, brands, storageTokenRef.current);
     if (!result.ok) { setStorageError(result.error); toast(result.error); return; }
+    storageTokenRef.current = result.storageToken;
     setRecords(next);
     setDraft(record);
     setDirty(false);
@@ -252,6 +312,7 @@ export default function AdminApp() {
         </div>
         <div className="lv-notice"><Icon name="info" size={19} /><p><strong>Você está em uma demonstração de front-end.</strong> Os cadastros ficam somente neste navegador. Nenhum dado é enviado ao servidor.</p><span>Sem conexão com API</span></div>
         {storageError && <p className="lv-error" role="alert">{storageError}</p>}
+        {storageError && <button type="button" className="lv-btn lv-btn-secondary lv-refresh-data" onClick={refreshStoredState}><Icon name="copy" size={18} />Atualizar cadastros</button>}
 
         {view === 'clients' ? <>
           <div className="lv-stats">{[[records.length, 'Páginas cadastradas', 'users', 'Neste navegador'], [readyCount, 'Configuradas', 'check', 'Prontas para visualizar'], [records.reduce((total, record) => total + record.page.products.length, 0), 'Produtos cadastrados', 'store', 'Nos catálogos dos clientes']].map(([value, label, icon, note]) => <article className="lv-stat" key={label}><div><small>{label}</small><strong>{value.toString().padStart(2, '0')}</strong><p>{note}</p></div><span className="lv-stat-icon"><Icon name={icon} size={22} /></span></article>)}</div>
@@ -261,7 +322,7 @@ export default function AdminApp() {
               const ready = isConfigured(record, records, brands);
               return <article key={record.id} className="lv-client-card"><div className="lv-client-avatar">{safeLogo(record.page.logo) ? <img src={safeLogo(record.page.logo)} alt="" /> : record.page.name.slice(0, 2).toUpperCase() || 'LV'}</div><div className="lv-client-info"><h3>{record.page.name || 'Página sem nome'}</h3><p>{record.clientName} <span aria-hidden="true">/</span> {record.page.slug}</p><small>{updatedLabel(record.updatedAt)}</small></div><span className={`lv-client-status ${ready ? 'lv-status-ready' : 'lv-status-draft'}`}><span />{ready ? 'Configurada' : 'Pendente'}</span><div className="lv-client-actions"><button type="button" className="lv-btn lv-btn-ghost lv-btn-small" onClick={() => openPreview(record)} aria-label={`Visualizar ${record.page.name}`}><Icon name="eye" size={17} />Visualizar</button><button type="button" className="lv-btn lv-btn-secondary lv-btn-small" onClick={() => openRecord(record)} aria-label={`Editar ${record.page.name}`}><Icon name="edit" size={17} />Editar página</button></div></article>;
             })}{!visibleRecords.length && <div className="lv-empty"><Icon name="search" size={30} /><h3>{records.length ? 'Nenhuma página encontrada.' : 'Vamos criar a primeira página?'}</h3><p>{records.length ? 'Tente outro nome ou altere o filtro.' : 'Comece com a identidade do cliente e adicione seus canais.'}</p><button type="button" className="lv-btn lv-btn-secondary" onClick={() => records.length ? (setSearch(''), setFilter('all')) : openRecord(null)}>{records.length ? 'Limpar filtros' : 'Criar página'}</button></div>}</div>
-            <div className="lv-list-footnote"><Icon name="info" size={15} />A página LocyTech é um modelo inicial. Os indicadores refletem somente os cadastros locais.</div>
+            <div className="lv-list-footnote"><Icon name="info" size={15} />Os cadastros e indicadores refletem somente os dados deste navegador.</div>
           </section>
         </> : view === 'brands' ? <BrandsList brands={brands} records={records} onCreate={() => openBrand(null)} onEdit={openBrand} onCreatePage={brand => openRecord(null, brand)} /> : view === 'brand-editor' ? <BrandForm key={brandDraft.id} brand={brandDraft} onChange={changeBrand} onSave={saveBrand} validation={validation} dirty={dirty} toast={toast} linkedCount={records.filter(record => record.brandId === brandDraft.id).length} /> : <>
         <div className="lv-studio-bar"><div className="lv-studio-info"><Icon name="window" size={22} /><div><strong>Editando sua página</strong><small className={`lv-studio-status${dirty ? ' is-dirty' : ''}`}>{dirty ? 'Alterações ainda não salvas' : 'Prévia interativa em tempo real'}</small></div></div><div className="lv-studio-actions"><button type="button" className="lv-btn lv-btn-secondary" onClick={() => openPreview(draft)}><Icon name="eye" size={18} />Ver prévia</button><button type="submit" form="lv-page-editor-form" className="lv-btn lv-btn-primary"><Icon name="save" size={18} />Salvar página</button></div></div>
@@ -287,9 +348,11 @@ export default function AdminApp() {
 
     {modal?.type === 'product' && <ProductEditor product={draft.page.products.find(item => item.id === modal.id)} previewPage={draft.page} initialFocus={modal.initialFocus} onClose={() => setModal(null)} onSave={saveProduct} />}
     {modal?.type === 'preview' && <Modal id="lv-preview-dialog" className="lv-preview-dialog" labelledBy="lv-preview-dialog-title" onClose={() => setModal(null)}><div className="lv-preview-dialog-heading"><div><span>PRÉVIA INTERATIVA</span><h2 id="lv-preview-dialog-title">Confira antes de salvar.</h2></div><button type="button" className="icon-button" aria-label="Fechar prévia" onClick={() => setModal(null)}><Icon name="close" /></button></div><LivePreview key={`${modal.initialView}-${modal.initialProductId || 'page'}`} page={modal.live && draft ? draft.page : modal.page} initialView={modal.initialView} initialProductId={modal.initialProductId} expanded onShare={() => openShare(modal.live && draft ? draft : { page: modal.page })} /></Modal>}
-    {modal && ['share', 'help', 'discard', 'remove-product'].includes(modal.type) && <Modal id="lv-dialog" className="modal lv-dialog" labelledBy="lv-dialog-title" onClose={() => setModal(null)}><div className="modal-topline"><span className="modal-eyebrow">LOCYVIEW</span><button type="button" className="icon-button" aria-label="Fechar janela" onClick={() => setModal(null)}><Icon name="close" /></button></div>
+    {modal && ['share', 'help', 'discard', 'remove-product', 'reset-records', 'restore-records'].includes(modal.type) && <Modal id="lv-dialog" className="modal lv-dialog" labelledBy="lv-dialog-title" onClose={() => setModal(null)}><div className="modal-topline"><span className="modal-eyebrow">LOCYVIEW</span><button type="button" className="icon-button" aria-label="Fechar janela" onClick={() => setModal(null)}><Icon name="close" /></button></div>
       {modal.type === 'share' && <><h2 id="lv-dialog-title">Página de demonstração</h2><p className="modal-description">Este link abre uma cópia de “{modal.name}”, sem os dados internos do cadastro.</p><label className="field-label" htmlFor="lv-share-url">Link de demonstração</label><textarea className="lv-share-link" id="lv-share-url" ref={shareRef} value={modal.url} readOnly rows={4} /><p className="lv-panel-description">Não é uma publicação em servidor. O link contém esta versão da página e não acompanha alterações futuras. Gere um novo link depois de editar.</p><div className="modal-actions"><button type="button" className="lv-btn lv-btn-secondary" onClick={copyLink}><Icon name="copy" size={18} />Copiar link</button><a className="lv-btn lv-btn-primary" href={modal.url} target="_blank" rel="noopener noreferrer">Abrir demonstração<Icon name="external" size={18} /></a></div></>}
-      {modal.type === 'help' && <><h2 id="lv-dialog-title">Da marca à página.</h2><p className="modal-description">1. Na aba Marcas, cadastre nome, logo e cores.<br />2. Crie a página do cliente e escolha uma marca.<br />3. Personalize a identidade, escolha um dos 24 modelos e organize seus canais.<br />4. Adicione produtos, confira a prévia e salve neste navegador.</p><p className="modal-description">Você pode trocar nome, logo e cores só desta página. Esses campos personalizados são preservados quando a marca muda. Use “Usar identidade da marca” para voltar aos padrões. Links de demonstração já gerados continuam sendo cópias daquela versão.</p><div className="lv-summary"><Icon name="info" /><p>Esta versão contém somente o front-end. Não há login, servidor, sincronização entre aparelhos ou cadastro centralizado. Não use o painel para guardar dados sigilosos. A conexão com a API será uma etapa futura.</p></div></>}
+      {modal.type === 'help' && <><h2 id="lv-dialog-title">Da marca à página.</h2><p className="modal-description">1. Na aba Marcas, cadastre nome, logo e cores.<br />2. Crie a página do cliente e escolha uma marca.<br />3. Personalize a identidade, escolha um dos 24 modelos e organize seus canais.<br />4. Adicione produtos, confira a prévia e salve neste navegador.</p><p className="modal-description">Você pode trocar nome, logo e cores só desta página. Esses campos personalizados são preservados quando a marca muda. Use “Usar identidade da marca” para voltar aos padrões. Links de demonstração já gerados continuam sendo cópias daquela versão.</p><div className="lv-summary"><Icon name="info" /><p>Esta versão contém somente o front-end. Não há login, servidor, sincronização entre aparelhos ou cadastro centralizado. Não use o painel para guardar dados sigilosos. A conexão com a API será uma etapa futura.</p></div><section className="lv-data-maintenance" aria-labelledby="lv-data-maintenance-title"><h3 id="lv-data-maintenance-title">Dados de teste</h3><p>Limpe todas as páginas, produtos e marcas deste navegador, mantendo o sistema e os 24 modelos. Uma cópia local permite desfazer a limpeza enquanto o painel estiver vazio.</p><button type="button" className="lv-btn lv-btn-secondary" disabled={storageConflict || Boolean(storageError) || (!records.length && !brands.length)} onClick={() => navigate(() => setModal({ type: 'reset-records' }))}><Icon name="trash" size={18} />Limpar cadastros de teste</button>{recovery.available && <><p className="lv-recovery-note">Cópia disponível: {recovery.recordCount} páginas e {recovery.brandCount} marcas. Restaurar só é permitido antes de cadastrar novos dados.</p><button type="button" className="lv-btn lv-btn-secondary" disabled={storageConflict || Boolean(storageError) || Boolean(records.length || brands.length)} onClick={() => navigate(() => setModal({ type: 'restore-records' }))}><Icon name="back" size={18} />Restaurar cadastros anteriores</button></>}{recovery.error && <p className="lv-error" role="alert">{recovery.error}</p>}</section></>}
+      {modal.type === 'reset-records' && <><h2 id="lv-dialog-title">Limpar os cadastros de teste?</h2><p className="modal-description">Serão removidas {records.length} páginas, seus produtos e {brands.length} marcas deste navegador. O código, as funções e os modelos do sistema não serão alterados.</p><div className="lv-summary"><Icon name="info" /><p>Uma cópia local será guardada antes da limpeza. Você poderá restaurá-la em Como funciona enquanto o painel estiver vazio.{recovery.available ? ' A cópia da limpeza anterior será substituída por estes cadastros.' : ''} Links de demonstração já gerados e dados de outros aparelhos não são apagados.</p></div><div className="modal-actions"><button type="button" className="lv-btn lv-btn-secondary" onClick={() => setModal(null)}>Cancelar</button><button type="button" className="lv-btn lv-btn-primary" onClick={cleanTestRecords}>Confirmar limpeza</button></div></>}
+      {modal.type === 'restore-records' && <><h2 id="lv-dialog-title">Restaurar os cadastros anteriores?</h2><p className="modal-description">A cópia local contém {recovery.recordCount} páginas e {recovery.brandCount} marcas. Nenhum dado será enviado ao servidor ou ao GitHub.</p><div className="modal-actions"><button type="button" className="lv-btn lv-btn-secondary" onClick={() => setModal(null)}>Cancelar</button><button type="button" className="lv-btn lv-btn-primary" onClick={recoverTestRecords}>Restaurar cadastros</button></div></>}
       {modal.type === 'discard' && <><h2 id="lv-dialog-title">Sair sem salvar?</h2><p className="modal-description">As alterações desta edição serão descartadas. O último cadastro salvo continuará no navegador.</p><div className="modal-actions"><button type="button" className="lv-btn lv-btn-secondary" onClick={() => setModal(null)}>Continuar editando</button><button type="button" className="lv-btn lv-btn-primary" onClick={() => { const action = modal.action; setModal(null); setDirty(false); action(); }}>Descartar alterações</button></div></>}
       {modal.type === 'remove-product' && <><h2 id="lv-dialog-title">Remover este produto?</h2><p className="modal-description">“{modal.name}” sairá do catálogo desta edição. A mudança só será guardada quando você salvar a página.</p><div className="modal-actions"><button type="button" className="lv-btn lv-btn-secondary" onClick={() => setModal(null)}>Cancelar</button><button type="button" className="lv-btn lv-btn-primary" onClick={() => { changePage({ products: draft.page.products.filter(item => item.id !== modal.id) }); setModal(null); }}>Remover produto</button></div></>}
     </Modal>}
