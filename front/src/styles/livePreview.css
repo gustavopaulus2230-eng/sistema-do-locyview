@@ -1,0 +1,102 @@
+.lv-admin .lv-preview-pane.lv-interactive-preview { min-width: 0; width: 100%; padding: 20px; border: 1px solid #2a3e5e; border-radius: 18px; background: linear-gradient(150deg, #12223b, #0b1629 72%); box-shadow: 0 18px 50px #030a181f; }
+.lv-admin .lv-live-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.lv-admin .lv-live-heading > div { min-width: 0; }
+.lv-admin .lv-live-eyebrow { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 7px; color: #c8d8ef; font-size: 10px; line-height: 1.5; font-weight: 650; letter-spacing: .05em; }
+.lv-admin .lv-live-eyebrow > span { width: 6px; height: 6px; border-radius: 50%; background: #9ed6ad; box-shadow: 0 0 0 3px #9ed6ad14; }
+.lv-admin .lv-live-heading h2 { margin: 0; max-width: 230px; color: #e7efff; font-size: 16px; font-weight: 650; line-height: 1.5; letter-spacing: -.025em; }
+.lv-admin .lv-live-expand { display: inline-grid; place-items: center; width: 44px; min-height: 44px; flex: none; border: 1px solid #344d70; border-radius: 9px; background: #162b48; color: #adcaef; }
+.lv-admin .lv-live-expand:hover { border-color: #6e9de0; background: #203b61; color: #f2f7ff; }
+.lv-admin .lv-live-toolbar { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
+.lv-admin .lv-live-tabs, .lv-admin .lv-preview-devices { display: flex; align-items: center; gap: 4px; width: 100%; padding: 4px; border: 1px solid #293d5b; border-radius: 10px; background: #081426; }
+.lv-admin .lv-live-tabs button, .lv-admin .lv-preview-devices button { display: inline-flex; justify-content: center; align-items: center; gap: 7px; min-height: 44px; flex: 1; padding: 9px 10px; border: 1px solid transparent; border-radius: 7px; color: #92a9c9; font-size: 12px; line-height: 1.4; font-weight: 550; }
+.lv-admin .lv-live-tabs button:hover, .lv-admin .lv-preview-devices button:hover { color: #dceaff; background: #132641; }
+.lv-admin .lv-live-tabs button[aria-pressed='true'], .lv-admin .lv-preview-devices button[aria-pressed='true'] { border-color: #385a87; background: #1a3356; color: #d5e6ff; box-shadow: 0 2px 7px #01061526; }
+.lv-admin .lv-live-tabs .icon, .lv-admin .lv-preview-devices .icon { width: 16px; height: 16px; }
+.lv-admin .lv-live-tabs button > span { display: inline-grid; place-items: center; min-width: 19px; min-height: 20px; padding: 2px 4px; border-radius: 4px; background: #29496f; color: #d8e8ff; font-size: 10px; }
+.lv-admin .lv-live-notice { display: flex; align-items: flex-start; gap: 8px; margin: 0 0 14px; padding: 11px 12px; border: 1px solid #3a506e; border-radius: 9px; background: #142a45; color: #bcd1ed; font-size: 12px; line-height: 1.7; }
+.lv-admin .lv-live-notice .icon { width: 16px; height: 16px; margin-top: 2px; }
+.lv-admin .lv-live-notice span { min-width: 0; overflow-wrap: anywhere; }
+.lv-admin .lv-preview-stage { min-width: 0; width: 100%; max-height: 720px; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #36537a #0a1628; border: 1px solid #2d4566; border-radius: 13px; background: #070f1e; }
+.lv-admin .lv-preview-canvas { width: 390px; max-width: 100%; min-width: 0; margin: 0 auto; }
+.lv-admin .lv-interactive-preview .client-page { border-radius: 0; }
+.lv-admin .lv-interactive-preview .client-page .hub-layout { min-height: 0; }
+.lv-admin .lv-interactive-preview .client-page .hub-card { cursor: pointer; }
+.lv-admin .lv-interactive-preview .lv-preview-catalog { padding: 25px 18px; }
+.lv-admin .lv-interactive-preview .lv-preview-product-detail { padding: 25px 22px; }
+.lv-admin .lv-preview-product-detail > .back-button { width: auto; margin-bottom: 25px; }
+.lv-admin .lv-live-footer { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 16px 0 0; }
+.lv-admin .lv-live-footer p { display: flex; align-items: flex-start; gap: 7px; flex: 1 1 230px; margin: 0; color: #8ca5c8; font-size: 11px; line-height: 1.8; }
+.lv-admin .lv-live-footer p .icon { width: 15px; height: 15px; margin-top: 3px; }
+.lv-admin .lv-interactive-preview.is-expanded { position: static; padding: 0; border: 0; background: none; box-shadow: none; }
+.lv-admin .lv-interactive-preview.is-expanded .lv-live-heading h2 { max-width: none; font-size: 21px; }
+.lv-admin .lv-interactive-preview.is-expanded .lv-live-toolbar { gap: 20px; }
+.lv-admin .lv-interactive-preview.is-expanded .lv-live-tabs, .lv-admin .lv-interactive-preview.is-expanded .lv-preview-devices { width: auto; }
+.lv-admin .lv-interactive-preview.is-expanded .lv-preview-stage { max-height: min(72dvh, 850px); min-height: 300px; padding: 22px; border-radius: 12px; background: #071020; }
+.lv-admin .lv-interactive-preview.is-expanded .lv-preview-canvas { overflow: hidden; border: 1px solid #3a4f6b; border-radius: 12px; box-shadow: 0 15px 50px #0003; }
+.lv-admin .lv-interactive-preview.is-expanded [data-device='desktop'] .lv-preview-canvas { width: 1000px; max-width: none; }
+.lv-admin .client-page .product-hidden-badge { display: inline-flex; align-items: center; gap: 7px; margin: 0 0 20px; padding: 8px 10px; border: 1px solid var(--brand-accent); border-radius: 7px; background: var(--brand-accent); color: var(--on-accent); font: 550 12px / 1.6 var(--page-font); }
+.lv-admin .client-page .product-hidden-badge .icon { width: 16px; height: 16px; }
+.lv-admin .client-page .product-details { min-width: 0; }
+.lv-admin .client-page .product-details .detail-title:focus { outline: none; }
+.lv-admin .lv-preview-dialog { position: fixed; width: min(1200px, calc(100vw - 32px)); max-width: calc(100vw - 32px); max-height: calc(100dvh - 32px); overflow: auto; overscroll-behavior: contain; padding: 25px; border: 1px solid #3b5377; border-radius: 18px; background: #0d192c; color: #e4eeff; box-shadow: 0 30px 100px #01040c80; }
+.lv-admin .lv-preview-dialog::backdrop { background: #020713bd; backdrop-filter: blur(8px); }
+.lv-admin .lv-preview-dialog-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding: 0 0 21px; margin-bottom: 23px; border-bottom: 1px solid #2c4261; }
+.lv-admin .lv-preview-dialog-heading > div { min-width: 0; }
+.lv-admin .lv-preview-dialog-heading span { display: block; margin-bottom: 7px; color: #8aa9d3; font-size: 10px; font-weight: 650; line-height: 1.5; letter-spacing: .1em; text-transform: uppercase; }
+.lv-admin .lv-preview-dialog-heading h2 { margin: 0; color: #edf4ff; font-size: 25px; line-height: 1.35; font-weight: 750; letter-spacing: -.035em; }
+.lv-admin .lv-preview-dialog-heading > button { display: inline-grid; place-items: center; width: 44px; min-height: 44px; flex: none; border: 1px solid #304969; border-radius: 10px; background: #142844; color: #bed5f6; }
+.lv-admin .lv-preview-dialog-heading > button:hover { background: #203b60; border-color: #638bc2; color: #fff; }
+
+/* Product editing keeps one form and a presentational review, never a nested dialog. */
+.lv-admin .lv-product-editor.has-live-preview { width: 1080px; padding: 28px; border-color: #385173; background: #0d192c; }
+.lv-admin .lv-product-editor .modal-description { margin-bottom: 22px; color: #98afd0; }
+.lv-admin .lv-product-edit-layout { min-width: 0; }
+.lv-admin .lv-product-edit-fields { min-width: 0; }
+.lv-admin .lv-product-review-tabs { display: flex; gap: 5px; margin: 0 0 24px; padding: 5px; border: 1px solid #2e4565; border-radius: 10px; background: #081324; }
+.lv-admin .lv-product-review-tabs button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: 1; min-height: 45px; padding: 10px; border: 1px solid transparent; border-radius: 7px; color: #9bb2d4; font-size: 13px; font-weight: 550; }
+.lv-admin .lv-product-review-tabs button[aria-pressed='true'] { border-color: #42658f; background: #1a3354; color: #d7e7ff; }
+.lv-admin .lv-product-review-tabs .icon { width: 17px; height: 17px; }
+.lv-admin .lv-product-draft-preview { display: none; min-width: 0; align-self: start; overflow: hidden; border: 1px solid #324b6b; border-radius: 13px; background: #0b1628; }
+.lv-admin .lv-product-draft-header { padding: 20px; border-bottom: 1px solid #2b4160; }
+.lv-admin .lv-product-draft-header h3 { margin: 0 0 7px; color: #dceaff; font-size: 16px; line-height: 1.5; font-weight: 650; letter-spacing: -.02em; }
+.lv-admin .lv-product-draft-header p { margin: 0; color: #8fa9cc; font-size: 12px; line-height: 1.8; }
+.lv-admin .lv-product-draft-preview .client-page .product-details { padding: 25px; }
+.lv-admin .lv-product-draft-preview .client-page .detail-title { font-size: calc(26px * var(--page-scale)); }
+.lv-admin .lv-product-draft-preview .client-page .detail-description { font-size: calc(15px * var(--page-scale)); }
+.lv-admin .lv-product-edit-layout[data-review='true'] .lv-product-edit-fields { display: none; }
+.lv-admin .lv-product-edit-layout[data-review='true'] .lv-product-draft-preview { display: block; }
+.lv-admin .lv-product-title-error { margin: 0 0 18px; padding: 11px 13px; border: 1px solid #8c4f60; border-radius: 8px; background: #382031; color: #ffd2d9; font-size: 13px; }
+.lv-admin .lv-product-editor .modal-actions { padding-top: 20px; margin-top: 20px; border-top: 1px solid #2a405d; }
+
+@media (min-width: 1100px) {
+  .lv-admin .lv-product-editor.has-live-preview .lv-product-edit-layout { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: start; gap: 30px; }
+  .lv-admin .lv-product-editor.has-live-preview .lv-product-review-tabs { display: none; }
+  .lv-admin .lv-product-editor.has-live-preview .lv-product-edit-fields, .lv-admin .lv-product-editor.has-live-preview .lv-product-draft-preview { display: block; }
+  .lv-admin .lv-product-editor.has-live-preview .lv-product-draft-preview { position: sticky; top: 0; }
+}
+
+@media (min-width: 700px) {
+  .lv-admin .lv-preview-pane.lv-interactive-preview { top: 104px; }
+  .lv-admin .lv-interactive-preview:not(.is-expanded) .lv-preview-stage { max-height: clamp(260px, calc(100dvh - 360px), 620px); }
+}
+
+@media (max-width: 699px) {
+  .lv-admin .lv-preview-pane.lv-interactive-preview { position: static; }
+  .lv-admin .lv-interactive-preview:not(.is-expanded) .lv-preview-stage { max-height: 520px; }
+}
+
+@media (max-width: 540px) {
+  .lv-admin .lv-preview-pane.lv-interactive-preview { padding: 16px 12px; }
+  .lv-admin .lv-live-heading { padding: 0 3px; }
+  .lv-admin .lv-live-heading h2 { font-size: 15px; }
+  .lv-admin .lv-live-tabs button, .lv-admin .lv-preview-devices button { min-height: 44px; padding: 9px; }
+  .lv-admin .lv-interactive-preview.is-expanded .lv-live-tabs, .lv-admin .lv-interactive-preview.is-expanded .lv-preview-devices { width: 100%; }
+  .lv-admin .lv-interactive-preview.is-expanded .lv-preview-stage { padding: 10px; }
+  .lv-admin .lv-interactive-preview.is-expanded .lv-live-heading h2 { font-size: 18px; }
+  .lv-admin .lv-product-editor.has-live-preview { padding: 23px 17px; }
+  .lv-admin .lv-product-draft-preview .client-page .product-details { padding: 22px 18px; }
+  .lv-admin .lv-product-review-tabs button { font-size: 12px; }
+  .lv-admin .lv-preview-dialog { width: calc(100vw - 20px); max-width: calc(100vw - 20px); max-height: calc(100dvh - 20px); padding: 20px 15px; border-radius: 13px; }
+  .lv-admin .lv-preview-dialog-heading { gap: 12px; padding-bottom: 17px; margin-bottom: 19px; }
+  .lv-admin .lv-preview-dialog-heading h2 { font-size: 22px; }
+}

@@ -14,14 +14,16 @@ Em `front/`, execute `npm install` na preparação inicial e `npm run dev` para 
 
 - `/`, `/admin` e `/admin/`: painel de páginas e marcas.
 - `/preview#p=`: demonstração independente de uma configuração de cliente.
-- Páginas: pesquisa, filtros, quatro etapas de cadastro e prévia.
+- Páginas: pesquisa, filtros, quatro etapas de cadastro e barra de ações para visualizar e salvar.
 - Marcas: cadastro de nome, logo e três cores, com vínculo às páginas.
 - Nome, logo e cores continuam editáveis nas páginas vinculadas; alterações de marca atualizam somente os campos ainda herdados.
 - Usar identidade da marca restaura a herança, sem mudar textos, links, produtos ou visual.
-- Aparência com 24 modelos reais, filtros, ajustes finos e ordem dos quatro canais, com prévia imediata.
+- Aparência com modelo base em destaque e três abas: Modelos, Ajustes e Organização; são 24 modelos, filtros, ajustes finos e ordem dos quatro canais.
 - Modelos preservam marca, paleta e conteúdo; fundos claros ou escuros mantêm contraste calculado.
 - Textos, identificador, assinatura, links e catálogo continuam específicos da página.
 - Catálogo: até 30 produtos por página, com edição, ordenação, visibilidade e remoção confirmada.
+- Prévia interativa de página, catálogo e detalhes, lateral ou ampliada nas larguras Celular e Computador, antes de salvar ou completar os campos obrigatórios.
+- Ver catálogo/Ver produto abrem o resultado diretamente; o formulário de produto também acompanha a digitação com seus detalhes reais.
 - Interface responsiva por largura disponível, com teclado e controles acessíveis.
 
 ## Dados e limitações
@@ -30,7 +32,11 @@ O conjunto `locyview-admin:v2` guarda marcas e páginas atomicamente no navegado
 
 A leitura legada versão 1 preserva identidades de páginas sem vinculá-las automaticamente a marcas. Dados versão 2 sem `identityOverrides` recebem lista vazia, e páginas sem `design` recebem o visual padrão, sem apagar cadastros ou mudar chaves. Uma lista vazia salva permanece vazia. Dados inválidos e armazenamento bloqueado impedem substituição; quota ou falha ao gravar mantém a edição aberta.
 
-A prévia contém dados públicos sanitizados e visual normalizado, não nome administrativo, datas, vínculo interno ou `identityOverrides`. O link guarda uma versão, não cria rota curta, não acompanha edições futuras e não tem revogação. A atualização de uma marca não altera snapshots antigos. Não incluir dados sigilosos.
+A prévia administrativa acompanha o rascunho atual, permite navegar e filtrar e não grava dados. Contatos externos são apenas inspecionados por aviso; não há envio ou orçamento nessa superfície. No editor de produto, Salvar produto aplica o item ao rascunho da página, mas a gravação local ainda depende de Salvar página.
+
+Gerar link é uma ação separada. O snapshot contém dados públicos sanitizados e visual normalizado, não nome administrativo, datas, vínculo interno ou `identityOverrides`. O link guarda uma versão, não cria rota curta, não acompanha edições futuras e não tem revogação. A atualização de uma marca não altera snapshots antigos. Não incluir dados sigilosos.
+
+Aplicar modelo preserva conteúdo, paleta e a prioridade dos canais. A prévia ao vivo e o snapshot compartilham renderização de página, catálogo e detalhes; somente o snapshot mantém os contatos validados como links externos reais.
 
 A demonstração usa quatro atalhos e catálogo aberto por clique. Os preços do modelo LocyTech são ilustrativos, em R$ 0,00, sem oferecer serviço gratuito. O orçamento apenas prepara texto, sem envio automático.
 
@@ -53,6 +59,9 @@ A hospedagem deste sistema é `https://locyview-painel.locytech.chatgpt.site`. �
 - [Painel de páginas e marcas](src/admin/AdminApp.jsx)
 - [Interface de marcas](src/admin/BrandViews.jsx)
 - [Designer de páginas](src/admin/PageDesignFields.jsx)
+- [Prévia interativa](src/admin/LivePreview.jsx)
+- [Detalhes compartilhados do produto](src/components/ProductDetails.jsx)
+- [Estilos da prévia e do editor de produto](src/styles/livePreview.css)
 - [Modelos e normalização](src/utils/pageDesign.js)
 - [Renderizador compartilhado](src/components/PageSurface.jsx)
 - [Estilos da biblioteca](src/styles/designer.css)

@@ -1,48 +1,59 @@
+/* Estúdio de aparência: componentes exclusivos do painel administrativo. */
 .lv-admin .lv-design-fields {
   container: lv-designer / inline-size;
   display: grid;
-  gap: 24px;
+  gap: 22px;
   min-width: 0;
   margin-top: 30px;
   padding-top: 28px;
-  border-top: 1px solid var(--lv-line);
+  border-top: 1px solid #2b3c53;
   color: var(--lv-text);
 }
+.lv-admin .lv-design-fields [hidden] { display: none !important; }
 .lv-admin .lv-design-heading { display: flex; align-items: flex-start; gap: 13px; }
-.lv-admin .lv-design-section-icon { display: grid; flex: none; place-items: center; width: 42px; height: 42px; border: 1px solid #35517b; border-radius: 12px; background: #142943; color: #a5caff; }
-.lv-admin .lv-design-heading h3 { margin: 0 0 7px; font-size: 19px; line-height: 1.4; letter-spacing: -.025em; }
-.lv-admin .lv-design-heading p, .lv-admin .lv-design-subheading p, .lv-admin .lv-design-help { margin: 0; color: #adbbcf; font-size: 15px; line-height: 1.65; }
-.lv-admin .lv-template-library { min-width: 0; border: 1px solid #31415a; border-radius: 14px; background: #0a1425; }
-.lv-admin .lv-template-library > summary { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 14px; min-height: 75px; padding: 17px; border-radius: 14px; list-style: none; cursor: pointer; touch-action: manipulation; }
-.lv-admin .lv-template-library > summary::-webkit-details-marker { display: none; }
-.lv-admin .lv-template-library > summary::marker { content: ''; }
-.lv-admin .lv-template-library > summary:focus-visible { outline: 2px solid #b2d1ff; outline-offset: 4px; }
-.lv-admin .lv-template-library > summary > span:first-child { display: grid; gap: 3px; }
-.lv-admin .lv-template-library > summary strong { color: #edf4ff; font-size: 16px; font-weight: 700; }
-.lv-admin .lv-template-library > summary small { color: #a2b4cd; font-size: 13px; }
-.lv-admin .lv-design-current { display: flex; align-items: center; gap: 8px; max-width: 100%; color: #acd0ff; font-size: 13px; }
-.lv-admin .lv-design-current .icon { flex: none; width: 17px; height: 17px; transition: transform .18s ease; }
-.lv-admin .lv-template-library[open] .lv-design-current .icon { transform: rotate(180deg); }
-.lv-admin .lv-template-library-body { display: grid; gap: 17px; min-width: 0; padding: 0 17px 17px; }
-.lv-admin .lv-template-filters { display: flex; flex-wrap: wrap; gap: 7px; padding-top: 4px; }
-.lv-admin .lv-template-filters button { display: inline-flex; justify-content: center; align-items: center; gap: 7px; min-height: 44px; padding: 8px 12px; border: 1px solid #33445e; border-radius: 8px; background: #101d32; color: #b7c6dc; font-size: 16px; font-weight: 600; line-height: 1.4; }
-.lv-admin .lv-template-filters button:hover { border-color: #83b2f3; color: #eff6ff; }
-.lv-admin .lv-template-filters button.is-active { border-color: #78adf8; background: #244c80; color: #f5f9ff; }
-.lv-admin .lv-template-filters button > span { display: grid; place-items: center; min-width: 21px; min-height: 21px; padding: 1px 4px; border-radius: 4px; background: #16365f; color: #c5dfff; font-size: 11px; }
-.lv-admin .lv-design-help { font-size: 13px; line-height: 1.6; }
-.lv-admin .lv-design-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; gap: 11px; min-width: 0; }
-.lv-admin .lv-template-card { display: flex; flex-direction: column; width: 100%; min-width: 0; overflow: hidden; padding: 5px; border: 1px solid #2c3e59; border-radius: 11px; background: #111d31; text-align: left; transition: border-color .15s, background .15s; }
-.lv-admin .lv-template-card:hover { border-color: #719fdd; background: #172945; }
-.lv-admin .lv-template-card.is-selected { border-color: #8ebdff; box-shadow: 0 0 0 1px #8ebdff; background: #192f4c; }
-.lv-admin .lv-template-card-copy { display: flex; flex: 1; align-items: flex-start; gap: 5px; width: 100%; padding: 10px 5px 7px; }
+.lv-admin .lv-design-section-icon { display: grid; flex: none; place-items: center; width: 43px; height: 43px; border: 1px solid #345174; border-radius: 13px; background: #172d46; color: #b0d1ff; }
+.lv-admin .lv-design-heading h3 { margin: 0 0 6px; color: #f0f5ff; font-size: 21px; font-weight: 750; line-height: 1.4; letter-spacing: -.035em; }
+.lv-admin .lv-design-heading p { margin: 0; color: #a5b8d0; font-size: 15px; line-height: 1.7; }
+.lv-admin .lv-design-selected-hero { display: grid; grid-template-columns: 128px minmax(0, 1fr); align-items: center; gap: 22px; min-width: 0; padding: 17px; border: 1px solid #374d68; border-radius: 17px; background: linear-gradient(118deg, #15253b, #101d30); }
+.lv-admin .lv-design-hero-thumbnail { min-width: 0; padding: 4px; border: 1px solid #47617f; border-radius: 13px; background: #081320; box-shadow: 0 7px 16px #02081430; }
+.lv-admin .lv-design-hero-thumbnail > .lv-design-thumb { height: 143px; border-radius: 8px; padding-left: 13px; padding-right: 13px; }
+.lv-admin .lv-thumb-logo img { width: 100%; height: 100%; border-radius: inherit; object-fit: contain; }
+.lv-admin .lv-design-hero-copy { min-width: 0; }
+.lv-admin .lv-design-kicker { display: block; margin-bottom: 7px; color: #d5c17c; font-size: 10px; font-weight: 650; line-height: 1.5; letter-spacing: .12em; }
+.lv-admin .lv-design-hero-copy h4 { margin: 0 0 8px; color: #f2f6fe; font-size: 23px; font-weight: 750; line-height: 1.35; letter-spacing: -.04em; }
+.lv-admin .lv-design-hero-copy p { margin: 0 0 16px; color: #adbed4; font-size: 14px; line-height: 1.65; }
+.lv-admin .lv-design-hero-tags { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.lv-admin .lv-design-hero-tags > span { display: inline-flex; align-items: center; gap: 5px; color: #b6cce8; font-size: 11px; line-height: 1.5; }
+.lv-admin .lv-design-hero-tags .icon { flex: none; width: 14px; height: 14px; color: #85b7f0; }
+.lv-admin .lv-design-navigation { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; padding: 5px; border: 1px solid #2c4059; border-radius: 12px; background: #091526; }
+.lv-admin .lv-design-navigation > button { display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; min-height: 49px; padding: 9px 7px; border: 1px solid transparent; border-radius: 8px; color: #9db2ce; font-size: 16px; line-height: 1.4; font-weight: 600; }
+.lv-admin .lv-design-navigation > button > .icon { flex: none; width: 18px; height: 18px; }
+.lv-admin .lv-design-navigation > button:hover { color: #e4efff; background: #13253c; }
+.lv-admin .lv-design-navigation > button.is-active { border-color: #405c7d; background: #213b5a; color: #eff6ff; box-shadow: 0 2px 5px #02091630; }
+.lv-admin .lv-design-tab-panel { display: grid; gap: 20px; min-width: 0; }
+.lv-admin .lv-design-panel-topline { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.lv-admin .lv-design-panel-topline > div { min-width: 0; flex: 1 1 200px; }
+.lv-admin .lv-design-panel-topline h4 { margin: 0 0 6px; color: #e7f0fe; font-size: 17px; line-height: 1.45; font-weight: 700; letter-spacing: -.02em; }
+.lv-admin .lv-design-panel-topline p { margin: 0; color: #9fb3ce; font-size: 14px; line-height: 1.7; }
+.lv-admin .lv-design-panel-topline > span { display: inline-flex; align-items: center; min-height: 26px; padding: 3px 8px; margin-top: 2px; border: 1px solid #365174; border-radius: 5px; background: #132942; color: #b2cceb; font-size: 11px; white-space: nowrap; }
+.lv-admin .lv-template-library { border: 0; background: transparent; }
+.lv-admin .lv-template-filters { display: flex; flex-wrap: wrap; gap: 7px; }
+.lv-admin .lv-template-filters button { display: inline-flex; justify-content: center; align-items: center; min-height: 44px; padding: 8px 12px; border: 1px solid #344a65; border-radius: 8px; background: #101e32; color: #a9bdd7; font-size: 14px; font-weight: 550; line-height: 1.4; }
+.lv-admin .lv-template-filters button:hover { border-color: #759fce; color: #ecf4ff; }
+.lv-admin .lv-template-filters button.is-active { border-color: #83b3ee; background: #2b4e77; color: #f5f9ff; }
+.lv-admin .lv-design-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; gap: 14px; min-width: 0; }
+.lv-admin .lv-template-card { position: relative; display: flex; flex-direction: column; width: 100%; min-width: 0; overflow: hidden; padding: 7px; border: 1px solid #2d435e; border-radius: 14px; background: #111e31; text-align: left; transition: border-color .15s, transform .15s, background .15s; }
+.lv-admin .lv-template-card:hover { transform: translateY(-2px); border-color: #7598c3; background: #182a42; }
+.lv-admin .lv-template-card.is-selected { border-color: #a1c5f4; box-shadow: 0 0 0 1px #a1c5f4; background: #203550; }
+.lv-admin .lv-template-card-copy { display: flex; flex: 1; align-items: flex-start; gap: 7px; width: 100%; padding: 13px 6px 8px; }
 .lv-admin .lv-template-card-copy > span:first-child { display: grid; gap: 5px; min-width: 0; }
-.lv-admin .lv-template-card-copy strong { color: #e9f1ff; font-size: 16px; line-height: 1.35; font-weight: 700; }
-.lv-admin .lv-template-card-copy small { color: #a7b9d1; font-size: 12px; line-height: 1.5; }
-.lv-admin .lv-template-selection { display: grid; flex: none; place-items: center; width: 22px; height: 22px; margin-left: auto; border: 1px solid #456489; border-radius: 50%; color: #8eacd4; }
-.lv-admin .is-selected .lv-template-selection { border-color: #8dbaff; background: #8dbaff; color: #09182d; }
+.lv-admin .lv-template-card-copy strong { color: #eaf2fd; font-size: 16px; line-height: 1.4; font-weight: 650; letter-spacing: -.025em; }
+.lv-admin .lv-template-card-copy small { color: #9eb4d0; font-size: 12px; line-height: 1.6; }
+.lv-admin .lv-template-selection { display: grid; flex: none; place-items: center; width: 23px; height: 23px; margin-left: auto; border: 1px solid #48617f; border-radius: 50%; color: #8ca5c4; }
+.lv-admin .is-selected .lv-template-selection { border-color: #abcffb; background: #abcffb; color: #0c1b30; }
 .lv-admin .lv-template-selection .icon { width: 14px; height: 14px; }
-.lv-admin .lv-design-gallery-note, .lv-admin .lv-design-save-note { display: flex; align-items: flex-start; gap: 9px; margin: 0; color: #a9bad0; font-size: 13px; line-height: 1.65; }
-.lv-admin .lv-design-gallery-note .icon, .lv-admin .lv-design-save-note .icon { flex: none; width: 18px; height: 18px; margin-top: 2px; color: #8eb7ee; }
+.lv-admin .lv-design-gallery-note, .lv-admin .lv-design-save-note { display: flex; align-items: flex-start; gap: 9px; margin: 0; color: #a9bad0; font-size: 13px; line-height: 1.75; }
+.lv-admin .lv-design-gallery-note .icon, .lv-admin .lv-design-save-note .icon { flex: none; width: 18px; height: 18px; margin-top: 2px; color: #91b6e4; }
 
 /* Miniaturas próprias de cada composição; não são capturas do site. */
 .lv-admin .lv-design-thumb { position: relative; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 9px; isolation: isolate; width: 100%; height: 142px; overflow: hidden; padding: 12px 17px; border-radius: 7px; background: var(--thumb-background); color: var(--thumb-ink); }
@@ -114,55 +125,82 @@
 .lv-admin .lv-design-thumb[data-layout='compact'] .lv-thumb-channels { gap: 3px; }
 .lv-admin .lv-design-thumb[data-layout='compact'] .lv-thumb-channel { min-height: 15px; }
 
-.lv-admin .lv-design-settings { display: grid; gap: 20px; min-width: 0; }
-.lv-admin .lv-design-subheading h4 { margin: 0 0 6px; color: #edf4ff; font-size: 17px; line-height: 1.4; }
-.lv-admin .lv-design-controls-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 16px; min-width: 0; }
-.lv-admin .lv-design-control { display: grid; align-content: start; gap: 8px; min-width: 0; }
-.lv-admin .lv-design-control > label, .lv-admin .lv-design-range label { color: #c6d4e8; font-size: 14px; line-height: 1.5; font-weight: 600; }
-.lv-admin .lv-design-control select { width: 100%; min-width: 0; min-height: 46px; padding: 10px 32px 10px 11px; border: 1px solid #3a4e6b; border-radius: 8px; background-color: #091426; color: #eff5ff; font-size: 16px; line-height: 1.45; }
-.lv-admin .lv-design-range { gap: 4px; }
+
+.lv-admin .lv-design-settings { gap: 17px; }
+.lv-admin .lv-design-setting-card { display: grid; gap: 20px; min-width: 0; padding: 21px; border: 1px solid #2d425d; border-radius: 13px; background: #0c192b; }
+.lv-admin .lv-design-setting-card > header { display: flex; align-items: flex-start; gap: 11px; }
+.lv-admin .lv-design-setting-card > header > span { display: grid; flex: none; place-items: center; width: 34px; height: 36px; border: 1px solid #324c6a; border-radius: 9px; background: #142b45; color: #a0c1ed; }
+.lv-admin .lv-design-setting-card > header .icon { width: 19px; height: 19px; }
+.lv-admin .lv-design-setting-card > header > div { min-width: 0; }
+.lv-admin .lv-design-setting-card h4 { margin: 0 0 4px; color: #e4effe; font-size: 16px; font-weight: 650; line-height: 1.5; }
+.lv-admin .lv-design-setting-card > header p { margin: 0; color: #9ab1d0; font-size: 13px; line-height: 1.65; }
+.lv-admin .lv-design-controls-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 21px 16px; min-width: 0; }
+.lv-admin .lv-design-control { display: grid; align-content: start; gap: 9px; min-width: 0; }
+.lv-admin .lv-design-control > label, .lv-admin .lv-design-range label { color: #bbcce3; font-size: 14px; line-height: 1.5; font-weight: 550; }
+.lv-admin .lv-design-control select { width: 100%; min-width: 0; min-height: 49px; padding: 11px 29px 11px 11px; border: 1px solid #3a516f; border-radius: 9px; background-color: #081526; color: #ecf3fe; font-size: 16px; line-height: 1.45; }
+.lv-admin .lv-design-control select:hover { border-color: #6686ae; }
+.lv-admin .lv-design-range { gap: 5px; }
 .lv-admin .lv-design-range > div { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-.lv-admin .lv-design-range output { flex: none; min-width: 53px; padding: 3px 7px; border: 1px solid #344f73; border-radius: 6px; background: #112b49; color: #bddaff; font-size: 13px; font-variant-numeric: tabular-nums; text-align: center; }
-.lv-admin .lv-design-range input[type='range'] { width: 100%; min-height: 44px; margin: 0; padding: 8px 0; border: 0; border-radius: 0; background: transparent; accent-color: #91bdff; cursor: pointer; }
-.lv-admin .lv-design-range-limits { display: flex; justify-content: space-between; gap: 10px; margin-top: -8px; color: #9baec9; font-size: 11px; font-variant-numeric: tabular-nums; }
-.lv-admin .lv-design-toggles { display: grid; gap: 8px; min-width: 0; margin: 0; padding: 17px 15px 14px; border: 1px solid #2d425f; border-radius: 11px; }
-.lv-admin .lv-design-toggles legend { padding: 0 7px; color: #c9d8ed; font-size: 15px; font-weight: 600; }
-.lv-admin .lv-design-toggle { display: flex; align-items: flex-start; gap: 12px; min-height: 52px; padding: 7px 0; cursor: pointer; }
-.lv-admin .lv-design-toggle input { flex: none; width: 20px; height: 20px; margin: 3px 0 0; accent-color: #91bdff; }
-.lv-admin .lv-design-toggle > span { display: grid; gap: 3px; min-width: 0; }
-.lv-admin .lv-design-toggle strong { color: #dae6f8; font-size: 15px; line-height: 1.5; font-weight: 550; }
-.lv-admin .lv-design-toggle small { color: #a6b9d3; font-size: 13px; line-height: 1.6; }
-.lv-admin .lv-design-order { display: grid; gap: 17px; min-width: 0; }
-.lv-admin .lv-design-order ol { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
-.lv-admin .lv-design-order li { display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 58px; padding: 5px 8px 5px 10px; border: 1px solid #2c405b; border-radius: 9px; background: #0a1628; }
-.lv-admin .lv-design-order-position { flex: none; width: 20px; color: #8ba4c6; font-size: 12px; text-align: center; }
-.lv-admin .lv-design-order li > .icon { flex: none; width: 20px; height: 20px; color: #9bc3fc; }
-.lv-admin .lv-design-order li > strong { min-width: 0; color: #d4e2f5; font-size: 15px; font-weight: 550; line-height: 1.4; }
-.lv-admin .lv-design-order-actions { display: flex; flex: none; gap: 3px; margin-left: auto; }
-.lv-admin .lv-design-order-actions button { display: grid; place-items: center; width: 44px; min-height: 44px; padding: 6px; border: 1px solid transparent; border-radius: 6px; background: #142944; color: #bad6fb; }
-.lv-admin .lv-design-order-actions button:hover:not(:disabled) { border-color: #8cb7f2; background: #224367; }
-.lv-admin .lv-design-order-actions button:disabled { opacity: .35; }
-.lv-admin .lv-design-save-note { padding: 13px; border: 1px solid #344b6c; border-radius: 9px; background: #12233b; color: #b8cbe5; font-size: 14px; }
+.lv-admin .lv-design-range output { flex: none; min-width: 54px; padding: 4px 7px; border: 1px solid #3b5576; border-radius: 6px; background: #18314d; color: #d0e4ff; font-size: 13px; font-variant-numeric: tabular-nums; text-align: center; }
+.lv-admin .lv-design-range input[type='range'] { width: 100%; min-height: 44px; margin: 0; padding: 8px 0; border: 0; border-radius: 0; background: transparent; accent-color: #a2c8f9; cursor: pointer; }
+.lv-admin .lv-design-range-limits { display: flex; justify-content: space-between; gap: 10px; margin-top: -8px; color: #96acca; font-size: 11px; font-variant-numeric: tabular-nums; }
+.lv-admin .lv-design-toggles { display: grid; gap: 0; min-width: 0; margin: 0; padding: 7px 20px 5px; border: 1px solid #2d425d; border-radius: 13px; background: #0c192b; }
+.lv-admin .lv-design-toggles legend { padding: 0 7px; color: #ccdaed; font-size: 15px; font-weight: 600; }
+.lv-admin .lv-design-toggle { display: flex; align-items: flex-start; gap: 13px; min-height: 75px; padding: 16px 0; cursor: pointer; }
+.lv-admin .lv-design-toggle + .lv-design-toggle { border-top: 1px solid #263b54; }
+.lv-admin .lv-design-toggle input { flex: none; width: 21px; height: 21px; margin: 4px 0 0; accent-color: #9ac4fa; }
+.lv-admin .lv-design-toggle > span { display: grid; gap: 4px; min-width: 0; }
+.lv-admin .lv-design-toggle strong { color: #d7e6fa; font-size: 16px; line-height: 1.5; font-weight: 550; }
+.lv-admin .lv-design-toggle small { color: #99afcc; font-size: 13px; line-height: 1.6; }
+.lv-admin .lv-design-order { gap: 20px; }
+.lv-admin .lv-design-order ol { display: grid; gap: 11px; margin: 0; padding: 0; list-style: none; }
+.lv-admin .lv-design-order li { display: flex; align-items: center; gap: 12px; min-width: 0; min-height: 80px; padding: 12px; border: 1px solid #30465f; border-radius: 12px; background: #0c1a2c; }
+.lv-admin .lv-design-order-position { flex: none; width: 23px; color: #7e98b9; font-size: 12px; text-align: center; font-variant-numeric: tabular-nums; }
+.lv-admin .lv-design-order-icon { display: grid; flex: none; place-items: center; width: 39px; height: 42px; border: 1px solid #365273; border-radius: 10px; background: #192f48; color: #b3cff2; }
+.lv-admin .lv-design-order-icon .icon { width: 20px; height: 20px; }
+.lv-admin .lv-design-order li > strong { min-width: 0; color: #dae8fa; font-size: 16px; font-weight: 600; line-height: 1.5; }
+.lv-admin .lv-design-order li > strong > small { display: block; margin-top: 3px; color: #91aaca; font-size: 12px; font-weight: 400; }
+.lv-admin .lv-design-order-actions { display: flex; flex: none; gap: 5px; margin-left: auto; }
+.lv-admin .lv-design-order-actions button { display: grid; place-items: center; width: 44px; min-height: 44px; padding: 6px; border: 1px solid #38516f; border-radius: 8px; background: #172e48; color: #c7dffb; }
+.lv-admin .lv-design-order-actions button:hover:not(:disabled) { border-color: #90b8eb; background: #254766; }
+.lv-admin .lv-design-order-actions button:disabled { opacity: .3; border-color: transparent; background: #142238; }
+.lv-admin .lv-design-save-note { padding: 15px 16px; border: 1px solid #314763; border-radius: 10px; background: #12243b; color: #aec4df; font-size: 13px; }
 
 @container lv-designer (min-width: 700px) {
   .lv-admin .lv-design-gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
-@container lv-designer (max-width: 370px) {
+@container lv-designer (max-width: 420px) {
   .lv-admin .lv-design-controls-grid { grid-template-columns: minmax(0, 1fr); }
-  .lv-admin .lv-template-library-body { padding: 0 11px 11px; }
-  .lv-admin .lv-template-library > summary { padding: 13px 11px; }
-  .lv-admin .lv-design-gallery { grid-template-columns: minmax(0, 1fr); gap: 11px; }
-  .lv-admin .lv-template-card { padding: 4px; }
-  .lv-admin .lv-design-thumb { height: 120px; padding: 10px 8px; }
-  .lv-admin .lv-template-card-copy { gap: 4px; padding: 9px 3px 5px; }
-  .lv-admin .lv-template-card-copy strong { font-size: 16px; }
-  .lv-admin .lv-template-card-copy small { font-size: 12px; }
-  .lv-admin .lv-template-selection { width: 18px; height: 18px; }
-  .lv-admin .lv-template-selection .icon { width: 12px; height: 12px; }
-  .lv-admin .lv-design-order li { gap: 7px; padding-left: 7px; }
-  .lv-admin .lv-design-order-position { width: 13px; }
+  .lv-admin .lv-design-selected-hero { grid-template-columns: 99px minmax(0, 1fr); gap: 15px; padding: 13px; }
+  .lv-admin .lv-design-hero-thumbnail > .lv-design-thumb { height: 137px; padding-left: 8px; padding-right: 8px; }
+  .lv-admin .lv-design-hero-copy h4 { font-size: 20px; }
+  .lv-admin .lv-design-hero-copy p { font-size: 13px; margin-bottom: 10px; }
+  .lv-admin .lv-design-kicker { font-size: 9px; letter-spacing: .07em; }
+  .lv-admin .lv-design-hero-tags { gap: 7px; }
+  .lv-admin .lv-design-hero-tags > span { font-size: 10px; }
+  .lv-admin .lv-design-navigation > button { flex-direction: column; gap: 5px; min-height: 66px; padding: 8px 3px; font-size: 14px; }
+  .lv-admin .lv-design-setting-card { padding: 17px; }
+  .lv-admin .lv-design-toggles { padding-left: 17px; padding-right: 17px; }
+  .lv-admin .lv-design-order-position { display: none; }
+  .lv-admin .lv-design-order li { gap: 9px; padding: 10px; }
+  .lv-admin .lv-design-order-icon { width: 33px; height: 39px; }
+  .lv-admin .lv-design-order-actions { gap: 3px; }
+}
+@container lv-designer (max-width: 370px) {
+  .lv-admin .lv-design-gallery { grid-template-columns: minmax(0, 1fr); gap: 13px; }
+  .lv-admin .lv-design-selected-hero { grid-template-columns: 84px minmax(0, 1fr); gap: 12px; padding: 11px; }
+  .lv-admin .lv-design-hero-thumbnail > .lv-design-thumb { height: 126px; padding-left: 6px; padding-right: 6px; }
+  .lv-admin .lv-design-hero-copy h4 { font-size: 18px; }
+  .lv-admin .lv-design-hero-copy p { font-size: 12px; }
+  .lv-admin .lv-design-hero-tags > span:last-child { display: none; }
+  .lv-admin .lv-design-navigation { gap: 3px; padding: 4px; }
+  .lv-admin .lv-design-navigation > button { font-size: 13px; }
+  .lv-admin .lv-template-filters button { padding: 8px 10px; font-size: 14px; }
+  .lv-admin .lv-design-gallery .lv-design-thumb { height: 163px; padding-left: 27px; padding-right: 27px; }
   .lv-admin .lv-design-order li > strong { font-size: 14px; }
+  .lv-admin .lv-design-order li > strong > small { display: none; }
+  .lv-admin .lv-design-order-icon { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .lv-admin .lv-template-card, .lv-admin .lv-design-current .icon { transition: none; }
+  .lv-admin .lv-template-card { transition: none; }
 }

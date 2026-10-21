@@ -16,11 +16,13 @@ Não há novo destino GitHub configurado para este painel. O repositório fornec
 - Marcas: nome, logo e três cores em um cadastro central.
 - Vínculo de páginas à marca, com edição livre e atualização local somente dos campos ainda herdados.
 - Restauração explícita da identidade da marca sem mudar conteúdo ou visual.
-- 24 modelos distintos, seis composições, ajustes finos e ordem dos quatro canais.
+- Modelo base em destaque e abas Modelos, Ajustes e Organização, com 24 modelos distintos, seis composições e controles finos.
 - Cores livres, seletor e HEX funcionais, com prévia imediata e contraste calculado.
 - Textos, identificador, assinatura, links e produtos próprios de cada página.
 - Catálogo com edição, ordenação, visibilidade e remoção de itens.
-- Prévia responsiva e link de demonstração com uma versão da página.
+- Prévia interativa de página, catálogo e detalhes, antes de salvar ou completar a identidade, com ampliação para celular e computador.
+- Ver catálogo e Ver produto diretos, além de detalhes do produto acompanhando a digitação no formulário.
+- Barra de ações para visualizar/salvar e geração separada de link de demonstração com uma versão fixa da página.
 - Salvamento manual no navegador, com validação e avisos de falha.
 
 O endereço principal `/` abre o painel; `/admin` é alias. `/preview#p=` abre somente o modelo de demonstração, mantido neste projeto. Não é uma rota do primeiro site nem publicação centralizada de cliente.
@@ -39,7 +41,9 @@ A versão administrativa `locyview-admin:v2` guarda marcas e páginas juntas, at
 
 Registros legados versão 1 continuam com suas identidades e sem vínculo automático. Dados vazios salvos continuam vazios. Conteúdo inválido ou armazenamento bloqueado não é substituído; erro ao salvar não apresenta sucesso parcial.
 
-Editar uma marca atualiza somente nome, logo e cores ainda herdados pelas páginas locais vinculadas. Campos personalizados são protegidos por `identityOverrides`. Não altera o primeiro site, outros aparelhos ou links de prévia antigos. Textos, identificadores, links, produtos, visual e dados administrativos de cada página são preservados. Aplicar modelo altera somente `design`, sem resetar nome, logo ou paleta. Dados antigos recebem padrões compatíveis, sem apagar cadastros.
+Editar uma marca atualiza somente nome, logo e cores ainda herdados pelas páginas locais vinculadas. Campos personalizados são protegidos por `identityOverrides`. Não altera o primeiro site, outros aparelhos ou links de prévia antigos. Textos, identificadores, links, produtos, visual e dados administrativos de cada página são preservados. Aplicar modelo altera somente os ajustes de `design`, sem resetar nome, logo, paleta ou a prioridade dos canais. Dados antigos recebem padrões compatíveis, sem apagar cadastros.
+
+A prévia administrativa usa o rascunho ao vivo, permite navegar entre página, catálogo e detalhes e não altera cadastros. Contatos externos mostram um aviso sem abrir outra plataforma. Editar um produto mostra sua apresentação antes de aplicar os dados; Salvar produto atualiza o rascunho, e Salvar página continua sendo a gravação local.
 
 O link de demonstração contém dados públicos da versão gerada. Inclui o visual escolhido, mas não nome administrativo, datas, vínculo interno, `identityOverrides` ou orçamento. Não atualiza sozinho, não cria endereço curto e não permite revogação. Não use o painel para informações sigilosas.
 
@@ -63,6 +67,9 @@ A rota administrativa não é uma proteção por login. Não há exclusão de ma
 - [Painel de páginas e marcas](front/src/admin/AdminApp.jsx)
 - [Interface de marcas](front/src/admin/BrandViews.jsx)
 - [Designer de páginas](front/src/admin/PageDesignFields.jsx)
+- [Prévia interativa](front/src/admin/LivePreview.jsx)
+- [Detalhes compartilhados do produto](front/src/components/ProductDetails.jsx)
+- [Estilos da prévia e do editor de produto](front/src/styles/livePreview.css)
 - [Modelos e validação](front/src/utils/pageDesign.js)
 - [Renderizador compartilhado](front/src/components/PageSurface.jsx)
 - [Estado administrativo](front/src/utils/adminState.js)

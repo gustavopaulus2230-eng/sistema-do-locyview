@@ -12,7 +12,7 @@ function CardCopy({ title, description, count }) {
   return <span className="hub-card-copy"><strong className="hub-card-title">{title}</strong><span className="hub-card-description">{description}</span>{count !== undefined && <span className="hub-card-count">{count} {count === 1 ? 'produto' : 'produtos'}</span>}</span>;
 }
 
-export default function Hub({ state, onProducts, onUnavailable, ownerTools, previewOnly = false, headingId }) {
+export default function Hub({ state, onProducts, onUnavailable, ownerTools, previewOnly = false, interactivePreview = false, headingId }) {
   const generatedId = useId();
   const identityId = headingId || `${generatedId}-identity`;
   const design = normalizeDesign(state.design);
@@ -27,12 +27,13 @@ export default function Hub({ state, onProducts, onUnavailable, ownerTools, prev
       </header>
       <nav className="hub-navigation" aria-label="Nossos canais">
         {design.channelOrder.map(platform => {
-          if (platform === 'products') return <button key={platform} type="button" className="hub-card hub-card-products" disabled={previewOnly} onClick={previewOnly ? undefined : onProducts}>
+          if (platform === 'products') return <button key={platform} type="button" className="hub-card hub-card-products" disabled={previewOnly && !interactivePreview} onClick={previewOnly && !interactivePreview ? undefined : onProducts}>
             <span className="hub-card-icon"><Icon name="store" size={28} /></span><CardCopy title="Nossos produtos" description="Landing pages, sites e lojas virtuais" count={count} /><Icon name="arrow" className="hub-card-arrow" size={21} />
           </button>;
           const social = socialDefaults.find(item => item.platform === platform);
           const destination = safeUrl(state.links.find(link => link.platform === social.platform)?.url);
           const content = <><span className="hub-card-icon"><Icon name={social.platform} size={28} /></span><CardCopy title={social.title} description={social.description} /><Icon name="arrow" className="hub-card-arrow" size={21} /></>;
+          if (interactivePreview) return <button key={social.platform} type="button" className={`hub-card hub-card-${social.platform}`} onClick={() => onUnavailable?.(social.title, destination)}>{content}</button>;
           if (previewOnly) return <button key={social.platform} type="button" className={`hub-card hub-card-${social.platform}`} disabled>{content}</button>;
           return <a key={social.platform} className={`hub-card hub-card-${social.platform}`} href={destination || '#'} target={destination ? '_blank' : undefined} rel={destination ? 'noopener noreferrer' : undefined} onClick={!destination ? event => { event.preventDefault(); onUnavailable(social.title); } : undefined}>
             {content}

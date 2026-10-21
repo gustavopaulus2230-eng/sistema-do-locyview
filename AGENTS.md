@@ -14,6 +14,10 @@ O estado `locyview-admin:v2` guarda marcas e páginas em uma única gravação l
 
 O visual fica em `page.design`, validado por `pageDesign.js`. Manter 24 modelos reais (seis composições × quatro estilos), controles finos e ordem dos quatro canais, sem alterar cores, logo ou conteúdo ao escolher modelo. Dados antigos sem `design` recebem padrões e sem `identityOverrides` recebem lista vazia, mantendo versão 2. Reutilizar `PageSurface` para que a prévia e o link gerado mostrem o mesmo resultado. Seletor de cor e HEX válidos precisam aplicar corretamente, com erro explícito para entrada inválida.
 
+O estúdio organiza visual em Modelos, Ajustes e Organização. Aplicar um modelo preserva a ordem escolhida dos canais. A prévia administrativa usa `LivePreview`, `Hub`, `Products` e `ProductDetails` compartilhados, com navegação funcional de página, catálogo e detalhes antes de salvar ou completar identidade. Ela é somente leitura dos cadastros, não uma superfície de botões desativados: contatos externos são interceptados, sem orçamento, envio ou mutação. Manter o filtro e evitar detalhes antigos após ocultar/remover item. Inspeção explícita de produto já oculto precisa mostrar aviso.
+
+Ver prévia e Gerar link são ações separadas. A prévia ao vivo acompanha o rascunho; o snapshot é uma cópia fixa. `ProductEditor` com `previewPage` apresenta o produto ainda em edição, sem diálogo ou formulário aninhado e sem persistir antes de Salvar produto/Salvar página. Preservar o diálogo nativo, seus títulos acessíveis e identificadores únicos entre prévias simultâneas.
+
 Não misturar nome administrativo, datas, vínculo interno, `identityOverrides` ou orçamento nos snapshots; incluir o visual normalizado. `#p=` contém uma versão pública, não um endereço curto, publicação sincronizada ou link revogável. Alterações de marcas e páginas afetam somente cadastros locais, nunca snapshots antigos ou o primeiro site. Não guardar informações sigilosas nem pedir senhas ou tokens.
 
 O modelo mantém quatro atalhos e catálogo aberto por clique. Preços ilustrativos, inclusive R$ 0,00, não anunciam serviço gratuito. Não exibir controles antigos de edição no modelo de prévia, inventar clientes, métricas ou envio de orçamento.
@@ -28,6 +32,8 @@ A porta local é 4174. Vite gera `build/` na raiz; dependências, build e arquiv
 - [Painel de páginas e marcas](front/src/admin/AdminApp.jsx)
 - [Interface de marcas](front/src/admin/BrandViews.jsx)
 - [Designer de páginas](front/src/admin/PageDesignFields.jsx)
+- [Prévia interativa](front/src/admin/LivePreview.jsx)
+- [Detalhes compartilhados](front/src/components/ProductDetails.jsx)
 - [Modelos e validação de visual](front/src/utils/pageDesign.js)
 - [Renderizador compartilhado](front/src/components/PageSurface.jsx)
 - [Estado administrativo](front/src/utils/adminState.js)

@@ -1,21 +1,22 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import Hub from './pages/Hub';
 import Products from './pages/Products';
 import Editor, { ProductEditor } from './components/Editor';
 import Modal from './components/Modal';
 import Icon from './components/Icon';
 import PageSurface from './components/PageSurface';
-import { categoryName, copyText, loadPageState, quoteDestinations, safeUrl, shareUrl, STORAGE_KEY } from './utils/pageState';
+import ProductDetails from './components/ProductDetails';
+import { copyText, loadPageState, quoteDestinations, safeUrl, shareUrl, STORAGE_KEY } from './utils/pageState';
 
 function CloseButton({ label, onClick, className = 'icon-button' }) {
   return <button type="button" className={className} aria-label={label} onClick={onClick}><Icon name="close" /></button>;
 }
 
 function ProductDetail({ product, onClose, onQuote }) {
-  return <Modal id="product-dialog" className="modal product-modal" labelledBy="detail-product-title" onClose={onClose}>
+  const titleId = `${useId()}-detail-title`;
+  return <Modal id="product-dialog" className="modal product-modal" labelledBy={titleId} onClose={onClose}>
     <CloseButton label="Fechar detalhes do produto" className="modal-close icon-button" onClick={onClose} />
-    <div id="product-detail-content"><span className={`detail-icon art-${product.icon}`}><Icon name={product.icon} size={32} /></span><p className="detail-category">{categoryName(product.category)}</p><h2 id="detail-product-title" className="detail-title">{product.title}</h2><p className="detail-description">{product.description}</p>{product.note && <p className="detail-note">{product.note}</p>}{product.features.length > 0 && <ul className="detail-features">{product.features.map((feature, index) => <li key={index}>{feature}</li>)}</ul>}<p className="detail-price">{product.price}</p><p className="detail-price-note">Preço ilustrativo para esta demonstração. O valor final depende do escopo do projeto.</p></div>
-    <button type="button" id="product-interest" className="button button-primary button-full" onClick={() => onQuote(product.id)}>Solicitar orçamento<Icon name="arrow" /></button>
+    <ProductDetails product={product} headingId={titleId} onQuote={onQuote} />
   </Modal>;
 }
 
